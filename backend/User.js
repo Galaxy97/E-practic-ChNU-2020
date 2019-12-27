@@ -1,7 +1,7 @@
 function Users() {
   // витягнути дані з довідника
   this.directories = new Directories().getDirectoriesFromFile();
-  
+
   // --------------------
   this.createDepartmentRecordForTable = function(department, accountSheet) {
     var fileId = this.createFile(department.namedepartment);
@@ -12,6 +12,7 @@ function Users() {
       institute_id: department.idparentdepartment,
       department_id: department.iddepartment,
       user_name: department.namedepartment,
+      versionDir: this.directories.version,
       user_sheet_id: fileId
     };
     accountSheet.writeInSheet("accounts", object);
@@ -38,6 +39,7 @@ function Users() {
            institute_id: institutes[key].idinstitute,
            department_id: false,
            user_name: institutes[key].nameinstitute,
+           versionDir: this.directories.version,
            user_sheet_id: false
          };
          accountSheet.writeInSheet("accounts", object);

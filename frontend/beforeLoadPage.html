@@ -1,0 +1,24 @@
+<script>
+  let userInfo = {};
+  let externalData = {};
+  // load information about user
+  getUserInfo()
+    .then(res => {
+      console.log(res);
+      userInfo = res;
+      successfulMesseage("дані прийшли");
+      // читання довідників з локал сторидж або завантаження з серверу, якщо не має
+      externalData = parseLocalStorage() || false;
+      console.log(externalData);
+      if (!externalData || userInfo.versionDir != externalData.versionDir) {
+        getExternalData()
+          .then(res => {
+            externalData = setExternalData(res);
+          })
+          .catch(e => failedMesseage(e));
+      }
+    })
+    .catch(e => {
+      failedMesseage(e);
+    });
+</script>

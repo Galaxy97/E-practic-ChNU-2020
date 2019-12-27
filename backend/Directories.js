@@ -55,6 +55,9 @@ function Directories() {
     }
     if (typeof version == "number" && version >= 1) newObject.version = ++version;
     var content = DriveApp.getFileById(fileId).setContent(JSON.stringify(newObject));
+    // user-information-sheet
+    var userSpreadSheet = new Sheet("17FqI3CWAc407PEIFzVMAGH2IGbtK6CoHliI-MQVQ7s0");
+    userSpreadSheet.updateColomn('accounts', 'versionDir', newObject.version);
   };
   // ------------------------------------
 

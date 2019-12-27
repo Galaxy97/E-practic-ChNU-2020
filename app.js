@@ -1,5 +1,5 @@
 function doGet() {
-  // var email = Session.getActiveUser().getEmail();
+  // var email = Session.getActiveUser().getEmail(); // services => see
   var email = "im@vu.cdu.edu.ua";
   var template;
   var accountTable = new Sheet("17FqI3CWAc407PEIFzVMAGH2IGbtK6CoHliI-MQVQ7s0");
@@ -7,7 +7,7 @@ function doGet() {
   var uZver = new Users();
   // пошук користувача в таблиці авторизованиї користувачів
   accounts.forEach(function(element) {
-    if ((element.user_email == email)) {
+    if (element.user_email == email) {
       switch (element.type) {
         case "dep":
           template = HtmlService.createTemplateFromFile("frontend/templates/department"); // сторінка для кафедри
@@ -26,6 +26,8 @@ function doGet() {
   });
   if (template) return template.evaluate(); // якщо користувач був в системі, то він отримає свій шаблон
   // інакше потрібно зареєструвати користувача або відмовити в доступі
-  var usersTemplate = HtmlService.createTemplateFromFile(uZver.findUserByEmail(email, accountTable));
+  var usersTemplate = HtmlService.createTemplateFromFile(
+    uZver.findUserByEmail(email, accountTable)
+  );
   return usersTemplate.evaluate();
 }

@@ -1,0 +1,49 @@
+<script>
+  function getUserInfo() {
+    return new Promise((resolve, reject) => {
+      google.script.run // отримання електроної пошти клієнта
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .getUserInfo();
+    });
+  }
+
+  function failedMesseage(error) {
+    console.error(error);
+    Toast.add({
+      header: "Вибачте, сталась помилка",
+      body: "Подальші дії можуть виконатись не коректно, будь-ласка перезавантажте сторінку",
+      color: "#ff0000",
+      autohide: true,
+      delay: 60000
+    });
+  }
+  function successfulMesseage(messeage) {
+    Toast.add({
+      header: "Успіх",
+      body: messeage,
+      color: "#28a745",
+      autohide: true,
+      delay: 5000
+    });
+  }
+  function parseLocalStorage(elem) {
+    return JSON.parse(localStorage.getItem('externalData'));
+  }
+
+  function getExternalData() {
+    return new Promise((resolve, reject) => {
+      google.script.run // отримання електроної пошти клієнта
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .getExternalData();
+    });
+  }
+
+  function setExternalData(data) {
+    successfulMesseage('оновлено довідники')
+    console.log(data);
+    localStorage.setItem('externalData', JSON.stringify(data)); // see to Code
+    return data;
+  }
+</script>

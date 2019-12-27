@@ -53,4 +53,18 @@ function Sheet(id) {
       return undefined;
     }
   };
+
+  this.updateColomn = function(name, findKey, value) {
+    var sheet = this.sheet.getSheetByName(name);
+    var keys = this.getKeys(sheet, name);
+    keys.forEach(function(key, index){
+      if (findKey == key) {
+        var height = sheet.getLastRow();
+        var col = index + 1;
+        for(var row = 2; row <= height; row++) {
+          sheet.getRange(row, col).setValue(value);
+        }
+      }
+    })
+  };
 }
