@@ -6,6 +6,7 @@ function Directories() {
     "https://script.google.com/macros/s/AKfycbxU51MTEWbEzaN0Zg2oteeiIKMU6DzNatY5q4u0eMZTT-Lx67Q/exec",
     "https://script.google.com/macros/s/AKfycbyUse-NHP1hA1T1U8sj2FW3jI-LtC1UKGDNMX3AFiM8F8E3nHI/exec"
   ];
+  // ------------------------------------ метод для отримання актуальних даних із джерел довідника
   this.getDataAsOnbject = function() {
     var object = {
       handBook: {}
@@ -21,12 +22,18 @@ function Directories() {
     });
     return object;
   };
+  // ------------------------------------
+
+  // ------------------------------------ метод для створення нового файлу довідника //  використувати лише для створення файлу
   this.create = function() {
     var folder = DriveApp.getFolderById("1CklyNVNQ-sI4orD0Gsdm6I0G8YYbGMys");
     var object = this.getDataAsOnbject();
     object.version = 1;
     folder.createFile("dovidnuk.json", JSON.stringify(object));
   };
+  // ------------------------------------
+
+  // ------------------------------------  метод для оновлення довідника із джерел зі зміною версії
   this.update = function() {
     var newObject = this.getDataAsOnbject();
     var files = DriveApp.getFilesByName("dovidnuk.json");
@@ -46,9 +53,20 @@ function Directories() {
         version = data.version;
       }
     }
-    if(typeof version == "number" && version >= 1)newObject.version = ++version;
-    var content = DriveApp.getFileById(fileId)
-          .setContent(JSON.stringify(newObject));
-    Logger.log(JSON.stringify(newObject));
+    if (typeof version == "number" && version >= 1) newObject.version = ++version;
+    var content = DriveApp.getFileById(fileId).setContent(JSON.stringify(newObject));
   };
+  // ------------------------------------
+
+  // ------------------------------------ функція для зчитування довідників з файлу
+  this.getDirectoriesFromFile = function() {
+    var files = DriveApp.getFilesByName("dovidnuk.json");
+    var file = files.next();
+    var fileId = file.getId();
+    var content = DriveApp.getFileById(fileId)
+      .getBlob()
+      .getDataAsString();
+    return JSON.parse(content);
+  };
+  // ------------------------------------
 }
