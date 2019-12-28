@@ -27,33 +27,63 @@
 
   // ----------- створити рядок для додавання нового графіку
   function createNewGraph() {
-    const tr = createInputUnits("create");
+    const tr = document.createElement("tr");
+    const newRecord = createInputUnits(tr, "create"); // стоворити комірки для введення інформації, та повернути об'єкт як результат, де будуть зберігатись дані з юнітів
+    tr.append(createNewGraphButtons(tr, newRecord));
     return tr;
   }
   // -------------------------------------------------------
 
   //-------------- створення елементів для введення інформації
-  function createInputUnits(mode) {
-    const tr = document.createElement("tr");
+  function createInputUnits(tr, mode, data) {
+    const thisRecord =
+      data ||
+      (() => {
+        const obj = {};
+        externalData.formData.forEach(unit => {
+          obj[unit.key] = false;
+        });
+        return obj;
+      })();
+
     externalData.formData.forEach(unit => {
       if (!unit.display) return false;
       const td = document.createElement("td");
+      td.onchange = () => {
+        thisRecord[unit.key] = td.childNodes[0].value;
+      };
       tr.append(td);
       td.append(createInputUnit(mode, unit));
     });
-    return tr;
+    return thisRecord;
   }
   //--------------------------------------------------------
 
   //-------------- створення елементу для введення інформації
   function createInputUnit(mode, unit) {
     switch (unit.tag) {
+      //  -------------------------------------------------------------   SELECT
       case "select":
         const select = document.createElement("select");
         if (unit.dependency) {
           // якщо є залежність для виведення даних, ствротити пустий опшин та надати id щоб потім знайти цей елемент та наповнити
           select.append(createDefaulteOption());
           select.id = `${mode}-${unit.key}`;
+          // ====== special
+          if (unit.key === "specialty") {
+            const data = sortData(
+              externalData.handBook[unit.key],
+              userInfo.department_id,
+              externalData.objectKeys[unit.key]
+            );
+            console.log(data);
+              for (const key in data) {
+                const value = data[key][externalData.objectKeys[unit.key].value];
+                const text = data[key][externalData.objectKeys[unit.key].text];
+                select.append(createOption(value, text));
+              }
+          }
+          // ====== end special
         } else {
           if (unit.descendant) {
             select.onchange = () => {
@@ -65,7 +95,6 @@
                 value,
                 externalData.objectKeys[unit.descendant]
               );
-              console.log(data);
               // ----------
               descendant.append(createDefaulteOption());
               for (const key in data) {
@@ -79,17 +108,21 @@
           // якщо не має жодних залежностей
           select.append(createDefaulteOption());
           for (const key in externalData.handBook[unit.key]) {
-            const value =
-              externalData.handBook[unit.key][key][externalData.objectKeys[unit.key].value];
-            const text =
-              externalData.handBook[unit.key][key][externalData.objectKeys[unit.key].text];
+            const value = externalData.handBook[unit.key][key][externalData.objectKeys[unit.key].value];
+            const text = externalData.handBook[unit.key][key][externalData.objectKeys[unit.key].text];
             select.append(createOption(value, text));
           }
         }
         return select;
         break;
-
-      default:
+      //  -------------------------------------------------------------  END  SELECT
+      case "input":
+        const input = document.createElement("input");
+        input.type = unit.type;
+        return input;
+        break;
+      case "system":
+        return "";
         break;
     }
   }
@@ -119,5 +152,21 @@
       }
     }
     return array;
+  }
+
+  function createNewGraphButtons(tr, thisRecorData) {
+    const td = document.createElement("td");
+    const saveBtn = document.createElement("button");
+    const cancelBtn = document.createElement("button");
+    td.append(saveBtn);
+    td.append(cancelBtn);
+
+    saveBtn.innerText = "зберегти";
+    saveBtn.onclick = () => {
+      console.log(thisRecorData);
+    };
+
+    cancelBtn.innerText = "відмінити";
+    return td;
   }
 </script>
