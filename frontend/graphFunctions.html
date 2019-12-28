@@ -77,11 +77,11 @@
               externalData.objectKeys[unit.key]
             );
             console.log(data);
-              for (const key in data) {
-                const value = data[key][externalData.objectKeys[unit.key].value];
-                const text = data[key][externalData.objectKeys[unit.key].text];
-                select.append(createOption(value, text));
-              }
+            for (const key in data) {
+              const value = data[key][externalData.objectKeys[unit.key].value];
+              const text = data[key][externalData.objectKeys[unit.key].text];
+              select.append(createOption(value, text));
+            }
           }
           // ====== end special
         } else {
@@ -163,10 +163,36 @@
 
     saveBtn.innerText = "зберегти";
     saveBtn.onclick = () => {
-      console.log(thisRecorData);
+      thisRecorData.user_email = userInfo.user_email;
+      thisRecorData.institutes = userInfo.institute_id;
+      thisRecorData.departments = userInfo.department_id;
+
+      for (const unit of externalData.formData) {
+        if (unit.necessarily) {
+          if (!thisRecorData[unit.key]) {
+            alert(`Введіть дані ${unit.name}`);
+            return;
+          }
+        }
+      }
+      // externalData.formData.forEach(unit => {
+      //   if (unit.necessarily) {
+      //     if (!thisRecorData[unit.key]) {
+      //       alert(`Введіть дані ${unit.name}`);
+      //       return
+      //     }
+      //   }
+      // })
+
+      tr.remove();
+      createBtnNewGraph();
     };
 
     cancelBtn.innerText = "відмінити";
+    cancelBtn.onclick = () => {
+      tr.remove();
+      createBtnNewGraph();
+    };
     return td;
   }
 </script>
