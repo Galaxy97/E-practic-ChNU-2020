@@ -1,0 +1,123 @@
+<script>
+  // ------ створити заголовки для таблиці графіків з довідників
+  function createHeader() {
+    const tr = document.createElement("tr");
+    externalData.formData.forEach(unit => {
+      if (!unit.display) return false; // якщо елемент не потрібно відображати, пропустити його
+      const th = document.createElement("th");
+      th.innerText = unit.name;
+      tr.append(th);
+    });
+    return tr;
+  }
+  //-------------------------------------------------------------
+
+  //-------------- створення кнопки для створення рядку для створення нового графіку
+  function createBtnNewGraph() {
+    const table = document.getElementById("table");
+    const btn = document.createElement("button");
+    btn.innerText = "створити новий графік";
+    btn.onclick = () => {
+      btn.remove();
+      table.append(createNewGraph());
+    };
+    table.append(btn);
+  }
+  //--------------------------------------------------------
+
+  // ----------- створити рядок для додавання нового графіку
+  function createNewGraph() {
+    const tr = createInputUnits("create");
+    return tr;
+  }
+  // -------------------------------------------------------
+
+  //-------------- створення елементів для введення інформації
+  function createInputUnits(mode) {
+    const tr = document.createElement("tr");
+    externalData.formData.forEach(unit => {
+      if (!unit.display) return false;
+      const td = document.createElement("td");
+      tr.append(td);
+      td.append(createInputUnit(mode, unit));
+    });
+    return tr;
+  }
+  //--------------------------------------------------------
+
+  //-------------- створення елементу для введення інформації
+  function createInputUnit(mode, unit) {
+    switch (unit.tag) {
+      case "select":
+        const select = document.createElement("select");
+        if (unit.dependency) {
+          // якщо є залежність для виведення даних, ствротити пустий опшин та надати id щоб потім знайти цей елемент та наповнити
+          select.append(createDefaulteOption());
+          select.id = `${mode}-${unit.key}`;
+        } else {
+          if (unit.descendant) {
+            select.onchange = () => {
+              const value = select.options[select.selectedIndex].value;
+              const descendant = document.getElementById(`${mode}-${unit.descendant}`);
+              descendant.innerHTML = "";
+              const data = sortData(
+                externalData.handBook[unit.descendant],
+                value,
+                externalData.objectKeys[unit.descendant]
+              );
+              console.log(data);
+              // ----------
+              descendant.append(createDefaulteOption());
+              for (const key in data) {
+                const value = data[key][externalData.objectKeys[unit.descendant].value];
+                const text = data[key][externalData.objectKeys[unit.descendant].text];
+                descendant.append(createOption(value, text));
+              }
+              //-----------
+            };
+          }
+          // якщо не має жодних залежностей
+          select.append(createDefaulteOption());
+          for (const key in externalData.handBook[unit.key]) {
+            const value =
+              externalData.handBook[unit.key][key][externalData.objectKeys[unit.key].value];
+            const text =
+              externalData.handBook[unit.key][key][externalData.objectKeys[unit.key].text];
+            select.append(createOption(value, text));
+          }
+        }
+        return select;
+        break;
+
+      default:
+        break;
+    }
+  }
+  //--------------------------------------------------------
+
+  function createOption(value, text) {
+    const option = document.createElement("option");
+    option.value = value;
+    option.text = text;
+    return option;
+  }
+  function createDefaulteOption() {
+    const option = document.createElement("option");
+    option.setAttribute("selected", null);
+    option.setAttribute("disabled", null);
+    option.setAttribute("hidden", null);
+
+    option.value = "";
+    option.text = "Виберіть дані";
+    return option;
+  }
+  function sortData(sourceData, criterion, setting) {
+    const array = [];
+    for (const key in sourceData) {
+      if (criterion == sourceData[key][setting.parantValue]) {
+        array.push(sourceData[key]);
+      }
+    }
+    return array;
+  }
+</script>

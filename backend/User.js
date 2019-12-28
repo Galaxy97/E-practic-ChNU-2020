@@ -21,30 +21,30 @@ function Users() {
   this.findUserByEmail = function(email, accountSheet) {
     // пошук на кафедрах
     var departs = this.directories.handBook.departments;
-    for(var key in departs) {
-       if (email == departs[key].emaildepartment) {
-         this.createDepartmentRecordForTable(departs[key], accountSheet);
-         return "frontend/templates/department";
+    for (var key in departs) {
+      if (email == departs[key].emaildepartment) {
+        this.createDepartmentRecordForTable(departs[key], accountSheet);
+        return "frontend/templates/department";
       }
     }
     // ----------------------- кінець на кафедрах
 
     // пошук в інститутах
     var institutes = this.directories.handBook.institutes;
-    for(var key in institutes) {
-       if (email == institutes[key].emailinstitute) {
-         var object = {
-           user_email: email,
-           type: "inst",
-           institute_id: institutes[key].idinstitute,
-           department_id: false,
-           user_name: institutes[key].nameinstitute,
-           versionDir: this.directories.version,
-           user_sheet_id: false
-         };
-         accountSheet.writeInSheet("accounts", object);
-         return "frontend/templates/institute";
-       }
+    for (var key in institutes) {
+      if (email == institutes[key].emailinstitute) {
+        var object = {
+          user_email: email,
+          type: "inst",
+          institute_id: institutes[key].idinstitute,
+          department_id: false,
+          user_name: institutes[key].nameinstitute,
+          versionDir: this.directories.version,
+          user_sheet_id: false
+        };
+        accountSheet.writeInSheet("accounts", object);
+        return "frontend/templates/institute";
+      }
     }
     // ----------------------- в інститутах
     // --------------------------------------------------------------------------
@@ -53,8 +53,11 @@ function Users() {
   };
   // --------------------
   this.createFile = function(name) {
-    var sheet = SpreadsheetApp.create(name);
-    var file = DriveApp.getFileById(sheet.getId());
+    var spreadSheet = SpreadsheetApp.create(name);
+    spreadSheet.insertSheet("main");
+    spreadSheet.insertSheet("order");
+    spreadSheet.insertSheet("basePractic");
+    var file = DriveApp.getFileById(spreadSheet.getId());
     var folder = DriveApp.getFolderById("1R2hInxDhtOu2vQoKVPyA7mGNnRJE25_Z");
     var newFile = file.makeCopy(file, folder);
     DriveApp.getFileById(file.getId()).setTrashed(true);

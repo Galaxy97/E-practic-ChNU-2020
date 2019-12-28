@@ -1,0 +1,19 @@
+<script>
+  const tableData = {};
+  function createTableHTML(sheetData) {
+    // create table
+    const table = document.createElement("table");
+    table.id = "table";
+    document.getElementById("main").append(table);
+
+    const headerRow = createHeader();
+    table.append(headerRow);
+
+    // if (sheetData) {
+    //   const bodyRows = createBody(sheetData);
+    //   table.append(bodyRows);
+    // }
+
+    createBtnNewGraph();
+  }
+</script>

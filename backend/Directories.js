@@ -20,6 +20,27 @@ function Directories() {
         object.handBook[element] = data[element];
       });
     });
+    object.objectKeys = {
+      // ключі в довіднику
+      institutes: { value: "idinstitute", text: "nameinstitute" },
+      departments: {
+        value: "iddepartment",
+        text: "namedepartment",
+        parantValue: "idparentdepartment"
+      },
+      specialty: {
+        value: "specialtyid",
+        text: "namespecialtyintegrated",
+        parantValue: "departmentid"
+      },
+      course_number: { value: "courseid", text: "coursename" },
+      form_of_training: { value: "formtrainingid", text: "formtrainingname" },
+      educational_degree: { value: "educationaldegreeid", text: "educationaldegreename" },
+      semester_number: { value: "semesterid", text: "semestername" },
+      type_of_control: { value: "typecontrolid", text: "typecontrolname" },
+      typepractice: { value: "typepracticeid", text: "typepracticename" },
+      rulespractice: { value: "namepracticeid", text: "namepractice", parantValue: "parentid" }
+    };
     return object;
   };
   // ------------------------------------
@@ -57,7 +78,7 @@ function Directories() {
     var content = DriveApp.getFileById(fileId).setContent(JSON.stringify(newObject));
     // user-information-sheet
     var userSpreadSheet = new Sheet("17FqI3CWAc407PEIFzVMAGH2IGbtK6CoHliI-MQVQ7s0");
-    userSpreadSheet.updateColomn('accounts', 'versionDir', newObject.version);
+    userSpreadSheet.updateColomn("accounts", "versionDir", newObject.version);
   };
   // ------------------------------------
 
@@ -72,4 +93,8 @@ function Directories() {
     return JSON.parse(content);
   };
   // ------------------------------------
+}
+
+function updateExternalData(){
+  new Directories().update();
 }

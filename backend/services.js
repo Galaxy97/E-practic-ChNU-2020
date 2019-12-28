@@ -22,3 +22,12 @@ function getExternalData() {
     return new Error("fail from load file");
   }
 }
+
+function getDateFromTable(sheetID) {
+  var sheet = new Sheet(sheetID);
+  try {
+    return sheet.readFromSheet('main');
+  } catch (e) {
+    return e;
+  }
+}

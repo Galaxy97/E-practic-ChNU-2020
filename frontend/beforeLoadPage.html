@@ -9,14 +9,14 @@
       successfulMesseage("дані прийшли");
       // читання довідників з локал сторидж або завантаження з серверу, якщо не має
       externalData = parseLocalStorage() || false;
-      console.log(externalData);
-      if (!externalData || userInfo.versionDir != externalData.versionDir) {
+      if (!externalData || userInfo.versionDir != externalData.version) {
         getExternalData()
           .then(res => {
             externalData = setExternalData(res);
+            createMainWindow();
           })
           .catch(e => failedMesseage(e));
-      }
+      } else createMainWindow();
     })
     .catch(e => {
       failedMesseage(e);

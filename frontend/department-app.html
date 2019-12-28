@@ -1,0 +1,10 @@
+<script>
+  function createMainWindow() {
+    // get data from user-table-sheets
+    getDateFromTable(userInfo.user_sheet_id)
+      .then(res => createTableHTML(res))
+      .catch ((error)=> {
+        failedMesseage(error);
+      })
+  }
+</script>

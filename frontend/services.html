@@ -1,4 +1,12 @@
 <script>
+  function getDateFromTable(tableId) {
+    return new Promise((resolve, reject) => {
+      google.script.run // отримання електроної пошти клієнта
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .getDateFromTable(tableId);
+    });
+  }
   function getUserInfo() {
     return new Promise((resolve, reject) => {
       google.script.run // отримання електроної пошти клієнта
@@ -28,7 +36,7 @@
     });
   }
   function parseLocalStorage(elem) {
-    return JSON.parse(localStorage.getItem('externalData'));
+    return JSON.parse(localStorage.getItem("externalData"));
   }
 
   function getExternalData() {
@@ -41,9 +49,25 @@
   }
 
   function setExternalData(data) {
-    successfulMesseage('оновлено довідники')
+    successfulMesseage("оновлено довідники");
     console.log(data);
-    localStorage.setItem('externalData', JSON.stringify(data)); // see to Code
+    localStorage.setItem("externalData", JSON.stringify(data)); // see to Code
     return data;
   }
+  // -----------------------------------------------------------------------------
+  function autoComplite(arr, id) {
+    new autoComplete({
+      selector: "#" + id,
+      minChars: 1,
+      source: function(term, suggest) {
+        term = term.toLowerCase();
+        var choices = arr;
+        var suggestions = [];
+        for (i = 0; i < choices.length; i++)
+          if (~choices[i].toLowerCase().indexOf(term)) suggestions.push(choices[i]);
+        suggest(suggestions);
+      }
+    });
+  }
+  //------------------------------------------------------------------------------
 </script>
