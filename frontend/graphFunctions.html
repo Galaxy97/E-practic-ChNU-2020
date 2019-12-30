@@ -67,14 +67,14 @@
         }
       };
       tr.append(td);
-      td.append(createInputUnit(mode, unit));
+      td.append(createInputUnit(mode, unit, data));
     });
     return thisRecord;
   }
   //--------------------------------------------------------
 
   //-------------- створення елементу для введення інформації
-  function createInputUnit(mode, unit) {
+  function createInputUnit(mode, unit, data) {
     switch (unit.tag) {
       //  -------------------------------------------------------------   SELECT
       case "select":
@@ -126,15 +126,46 @@
             select.append(createOption(value, text));
           }
         }
+        if (mode != "create" && data[unit.key]) {
+          if (unit.dependency) {
+            const sortDataArr = sortData(
+              externalData.handBook[unit.key],
+              data[unit.dependency],
+              externalData.objectKeys[unit.key]
+            );
+            for (const key in sortDataArr) {
+              const value = sortDataArr[key][externalData.objectKeys[unit.key].value];
+              const text = sortDataArr[key][externalData.objectKeys[unit.key].text];
+              select.append(createOption(value, text));
+            }
+          }
+          select.value = data[unit.key];
+        }
         return select;
         break;
       //  -------------------------------------------------------------  END  SELECT
       case "input":
         const input = document.createElement("input");
         input.type = unit.type;
+        if (mode != "create" && data[unit.key]) {
+          switch (unit.type) {
+            case "checkbox":
+              input.checked = data[unit.key];
+              break;
+            case "date":
+              input.value = new Date(data[unit.key]).toISOString().slice(0, 10);
+              break;
+            case "text":
+              input.value = data[unit.key];
+              break;
+          }
+        }
         return input;
         break;
       case "system":
+        if (mode != "create" && data[unit.key]) {
+          return data[unit.key];
+        }
         return "";
         break;
     }
@@ -207,8 +238,9 @@
 
   // ==========================================================               BODY
 
-  function createRowShowRecord(rowData) {
-    const tr = document.createElement("tr");
+  function createRowShowRecord(rowData, oldTr) {
+    const tr = oldTr || document.createElement("tr");
+    tr.innerHTML = "";
     tr.id = rowData.id;
     // витягнути з об'єкту дані та вивести їх підставивши дані з довідників
     externalData.formData.forEach(unit => {
@@ -248,6 +280,34 @@
     const editBtn = document.createElement("button");
     editBtn.innerText = "редагувати";
     td.append(editBtn);
+    editBtn.onclick = () => {
+      tr.innerHTML = "";
+      const editRecord = createInputUnits(tr, rowData.id, rowData); // стоворити комірки для введення інформації, та повернути об'єкт як результат, де будуть зберігатись дані з юнітів
+      const btnSave = document.createElement("button");
+      tr.append(btnSave);
+      btnSave.innerText = "зберегти";
+      btnSave.onclick = () => {
+        for (const unit of externalData.formData) {
+          if (unit.necessarily) {
+            if (!editRecord[unit.key]) {
+              alert(`Введіть дані ${unit.name}`);
+              return;
+            }
+          }
+        }
+        if (sendDataToSheet(userInfo.user_sheet_id, editRecord, editRecord.id)) {
+          // додати ці дані в таблицю та відмалювати
+          createRowShowRecord(editRecord, tr);
+        } else failedMesseage();
+      };
+
+      const btnCancel = document.createElement("button");
+      tr.append(btnCancel);
+      btnCancel.innerText = "відмінити";
+      btnCancel.onclick = () => {
+        createRowShowRecord(editRecord, tr);
+      };
+    };
     const deleteBtn = document.createElement("button");
     deleteBtn.innerText = "видалити";
     td.append(deleteBtn);

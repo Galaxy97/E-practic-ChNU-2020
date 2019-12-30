@@ -31,10 +31,10 @@ function getDataFromTable(sheetID) {
     return e;
   }
 }
-function sendDataToSheet(sheetID, record) {
+function sendDataToSheet(sheetID, record, id) {
   var sheet = new Sheet(sheetID);
   try {
-    sheet.writeInSheet("main", JSON.parse(record));
+    sheet.writeInSheet("main", JSON.parse(record), id);
     return true;
   } catch (error) {
     return false;

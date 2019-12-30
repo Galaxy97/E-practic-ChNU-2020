@@ -36,9 +36,17 @@ function Sheet(id) {
       else array.push("FALSE");
     });
     if (id) {
-      for (var i = 1; i <= keys.length; i++) {
-        if (keys[i] == "id") sheet.getRange(i, 1, 1, array.length).setValues([array]);
-      }
+      keys.forEach(function(key, index) {
+        if (key == "id") {
+          var allData = sheet.getRange(2, index + 1, sheet.getLastRow()).getValues();
+          allData.forEach(function(row, ind) {
+            if (row[0] == id) {
+              sheet.getRange(ind + 2, 1, 1, array.length).setValues([array]);
+              return true;
+            }
+          });
+        }
+      });
     } else sheet.appendRow(array);
   };
 
