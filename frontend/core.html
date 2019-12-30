@@ -8,11 +8,11 @@
 
     const headerRow = createHeader();
     table.append(headerRow);
-
-    // if (sheetData) {
-    //   const bodyRows = createBody(sheetData);
-    //   table.append(bodyRows);
-    // }
+    if (sheetData) {
+      for (const rowData of sheetData) {
+        table.append(createRowShowRecord(rowData)); 
+      }
+    }
 
     createBtnNewGraph();
   }

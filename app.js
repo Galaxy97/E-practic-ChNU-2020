@@ -31,3 +31,8 @@ function doGet() {
   );
   return usersTemplate.evaluate();
 }
+
+function logger(text) {
+  var sheet = SpreadsheetApp.openById('17FqI3CWAc407PEIFzVMAGH2IGbtK6CoHliI-MQVQ7s0').getSheetByName('log');
+  sheet.appendRow([JSON.stringify(text)]);
+}

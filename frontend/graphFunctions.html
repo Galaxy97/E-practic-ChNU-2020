@@ -8,6 +8,9 @@
       th.innerText = unit.name;
       tr.append(th);
     });
+    const th = document.createElement("th");
+    th.innerText = "edit place";
+    tr.append(th);
     return tr;
   }
   //-------------------------------------------------------------
@@ -50,7 +53,18 @@
       if (!unit.display) return false;
       const td = document.createElement("td");
       td.onchange = () => {
-        thisRecord[unit.key] = td.childNodes[0].value;
+        switch (unit.type) {
+          case "date":
+            thisRecord[unit.key] = String(new Date(td.childNodes[0].value).getTime());
+            break;
+          case "checkbox":
+            thisRecord[unit.key] = td.childNodes[0].checked;
+            break;
+
+          default:
+            thisRecord[unit.key] = td.childNodes[0].value;
+            break;
+        }
       };
       tr.append(td);
       td.append(createInputUnit(mode, unit));
@@ -76,7 +90,6 @@
               userInfo.department_id,
               externalData.objectKeys[unit.key]
             );
-            console.log(data);
             for (const key in data) {
               const value = data[key][externalData.objectKeys[unit.key].value];
               const text = data[key][externalData.objectKeys[unit.key].text];
@@ -166,6 +179,7 @@
       thisRecorData.user_email = userInfo.user_email;
       thisRecorData.institutes = userInfo.institute_id;
       thisRecorData.departments = userInfo.department_id;
+      thisRecorData.id = String(new Date().getTime());
 
       for (const unit of externalData.formData) {
         if (unit.necessarily) {
@@ -175,23 +189,78 @@
           }
         }
       }
-      // externalData.formData.forEach(unit => {
-      //   if (unit.necessarily) {
-      //     if (!thisRecorData[unit.key]) {
-      //       alert(`Введіть дані ${unit.name}`);
-      //       return
-      //     }
-      //   }
-      // })
-
-      tr.remove();
-      createBtnNewGraph();
+      if (sendDataToSheet(userInfo.user_sheet_id, thisRecorData)) {
+        // додати ці дані в таблицю та відмалювати
+        document.getElementById("table").append(createRowShowRecord(thisRecorData));
+        tr.remove();
+        createBtnNewGraph();
+      } else failedMesseage();
     };
 
     cancelBtn.innerText = "відмінити";
     cancelBtn.onclick = () => {
       tr.remove();
       createBtnNewGraph();
+    };
+    return td;
+  }
+
+  // ==========================================================               BODY
+
+  function createRowShowRecord(rowData) {
+    const tr = document.createElement("tr");
+    tr.id = rowData.id;
+    // витягнути з об'єкту дані та вивести їх підставивши дані з довідників
+    externalData.formData.forEach(unit => {
+      if (!unit.display) return false;
+      const td = document.createElement("td");
+      tr.append(td);
+      switch (unit.tag) {
+        case "system":
+          if (unit.key == "valid") td.innerText = rowData[unit.key] ? "Погоджено" : "";
+          else td.innerText = rowData[unit.key] || "";
+          break;
+        case "select":
+          td.innerText = externalData.handBook[unit.key][rowData[unit.key]][externalData.objectKeys[unit.key].text];
+          break;
+        case "input":
+          if (unit.type == "checkbox") td.innerText = rowData[unit.key] ? "Так" : "Ні";
+          if (unit.type == "date") {
+            const date = new Date(rowData[unit.key]);
+            if (date != "Invalid Date") td.innerText = date.toLocaleString().slice(0, 10);
+            else td.innerText = new Date(Number(rowData[unit.key])).toLocaleString().slice(0, 10);
+          }
+          if (unit.type == "text") td.innerText = rowData[unit.key] || "";
+          break;
+      }
+    });
+
+    // create edit buttons
+    if (rowData.valid) {
+    } else tr.append(createGrapEditButton(tr, rowData));
+    return tr;
+  }
+
+  // ==========================================================
+
+  function createGrapEditButton(tr, rowData) {
+    const td = document.createElement("td");
+    const editBtn = document.createElement("button");
+    editBtn.innerText = "редагувати";
+    td.append(editBtn);
+    const deleteBtn = document.createElement("button");
+    deleteBtn.innerText = "видалити";
+    td.append(deleteBtn);
+    deleteBtn.onclick = () => {
+      if (confirm("Ви хочете видалити графік?")) {
+        deleteRecordInTable(userInfo.user_sheet_id, "main", rowData.id)
+          .then(() => {
+            tr.remove();
+          })
+          .catch(e => {
+            failedMesseage(e);
+          });
+      }
     };
     return td;
   }

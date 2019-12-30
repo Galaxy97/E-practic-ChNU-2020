@@ -4,7 +4,7 @@
       google.script.run // отримання електроної пошти клієнта
         .withSuccessHandler(resolve)
         .withFailureHandler(reject)
-        .getDateFromTable(tableId);
+        .getDataFromTable(tableId);
     });
   }
   function getUserInfo() {
@@ -13,6 +13,22 @@
         .withSuccessHandler(resolve)
         .withFailureHandler(reject)
         .getUserInfo();
+    });
+  }
+  function sendDataToSheet(sheetID, record) {
+    return new Promise((resolve, reject) => {
+      google.script.run // отримання електроної пошти клієнта
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .sendDataToSheet(sheetID, JSON.stringify(record));
+    });
+  }
+  function deleteRecordInTable(sheetID, name, id) {
+    return new Promise((resolve, reject) => {
+      google.script.run // отримання електроної пошти клієнта
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .deleteRecordInTable(sheetID, name, id);
     });
   }
 
@@ -63,8 +79,7 @@
         term = term.toLowerCase();
         var choices = arr;
         var suggestions = [];
-        for (i = 0; i < choices.length; i++)
-          if (~choices[i].toLowerCase().indexOf(term)) suggestions.push(choices[i]);
+        for (i = 0; i < choices.length; i++) if (~choices[i].toLowerCase().indexOf(term)) suggestions.push(choices[i]);
         suggest(suggestions);
       }
     });

@@ -23,11 +23,29 @@ function getExternalData() {
   }
 }
 
-function getDateFromTable(sheetID) {
+function getDataFromTable(sheetID) {
   var sheet = new Sheet(sheetID);
   try {
-    return sheet.readFromSheet('main');
+    return JSON.stringify(sheet.readFromSheet("main"));
   } catch (e) {
     return e;
+  }
+}
+function sendDataToSheet(sheetID, record) {
+  var sheet = new Sheet(sheetID);
+  try {
+    sheet.writeInSheet("main", JSON.parse(record));
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+function deleteRecordInTable(sheetID, name, id) {
+  var sheet = new Sheet(sheetID);
+  try {
+    sheet.deleteRowFromSheet(name, id);
+    return true;
+  } catch (error) {
+    return false;
   }
 }
