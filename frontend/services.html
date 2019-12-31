@@ -15,6 +15,14 @@
         .getUserInfo();
     });
   }
+  function findDepartmentSheet(instititeID) {
+    return new Promise((resolve, reject) => {
+      google.script.run // отримання електроної пошти клієнта
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .findDepartmentSheet(instititeID);
+    });
+  }
   function sendDataToSheet(sheetID, record, id) {
     return new Promise((resolve, reject) => {
       google.script.run // отримання електроної пошти клієнта

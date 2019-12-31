@@ -4,19 +4,22 @@ function Sheet(id) {
   this.readFromSheet = function(sheetName) {
     var sheet = this.sheet.getSheetByName(sheetName);
     try {
-      var rows = sheet.getRange(1, 1, sheet.getLastRow(), sheet.getLastColumn()).getValues();
-      var dataArray = [];
-      for (var i = 1, l = rows.length; i < l; i++) {
-        var dataRow = rows[i];
-        var record = {};
-        if (dataRow.length) {
-          for (var j = 0, n = dataRow.length; j < n; j++) {
-            record[rows[0][j]] = dataRow[j];
-          } //for
-          dataArray.push(record);
-        } //if
-      }
-      return dataArray;
+      var keys = this.getKeys(sheet);
+      if (keys) {
+        var rows = sheet.getRange(1, 1, sheet.getLastRow(), sheet.getLastColumn()).getValues();
+        var dataArray = [];
+        for (var i = 1, l = rows.length; i < l; i++) {
+          var dataRow = rows[i];
+          var record = {};
+          if (dataRow.length) {
+            for (var j = 0, n = dataRow.length; j < n; j++) {
+              record[rows[0][j]] = dataRow[j];
+            } //for
+            dataArray.push(record);
+          } //if
+        }
+        return dataArray;
+      } else return undefined;
     } catch (error) {
       return new Error("error read");
     }

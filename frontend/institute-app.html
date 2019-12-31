@@ -1,0 +1,39 @@
+<script>
+  function createMainWindow() {
+    const select = document.createElement("select");
+    document.getElementById("choose").append(select);
+    select.append(createDefaulteOption());
+    const sortDataArr = sortData(
+      externalData.handBook.departments,
+      userInfo.institute_id,
+      externalData.objectKeys.departments
+    );
+    for (const key in sortDataArr) {
+      const value = sortDataArr[key][externalData.objectKeys.departments.value];
+      const text = sortDataArr[key][externalData.objectKeys.departments.text];
+      select.append(createOption(value, text));
+    }
+    select.onchange = () => {
+      const value = select.options[select.selectedIndex].value;
+      userInfo.department_id = value;
+      findDepartmentSheet(value)
+        .then(res => {
+          // get data from user-table-sheets
+          userInfo.user_sheet_id = res;
+          getDateFromTable(res)
+            .then(result => {
+              // console.log(result);
+              if (result) {
+                createTableHTML(JSON.parse(result));
+              } else createTableHTML();
+            })
+            .catch(error => {
+              failedMesseage(error);
+            });
+        })
+        .catch(e => {
+          failedMesseage(e);
+        });
+    };
+  }
+</script>

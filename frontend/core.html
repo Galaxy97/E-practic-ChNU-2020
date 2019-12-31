@@ -4,13 +4,14 @@
     // create table
     const table = document.createElement("table");
     table.id = "table";
+    document.getElementById("main").innerHTML = "";
     document.getElementById("main").append(table);
 
     const headerRow = createHeader();
     table.append(headerRow);
     if (sheetData) {
       for (const rowData of sheetData) {
-        table.append(createRowShowRecord(rowData)); 
+        table.append(createRowShowRecord(rowData));
       }
     }
 

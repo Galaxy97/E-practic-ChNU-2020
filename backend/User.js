@@ -16,6 +16,7 @@ function Users() {
       user_sheet_id: fileId
     };
     accountSheet.writeInSheet("accounts", object);
+    return fileId;
   };
   // --------------------
   this.findUserByEmail = function(email, accountSheet) {
@@ -43,7 +44,7 @@ function Users() {
           user_sheet_id: false
         };
         accountSheet.writeInSheet("accounts", object);
-        return "frontend/templates/institute";
+        return "frontend/templates/institutes";
       }
     }
     // ----------------------- в інститутах
@@ -62,5 +63,18 @@ function Users() {
     var newFile = file.makeCopy(file, folder);
     DriveApp.getFileById(file.getId()).setTrashed(true);
     return newFile.getId();
+  };
+  // --------------------
+  this.findByInstitutes = function(instID) {
+    var department = this.directories.handBook.departments[instID];
+    var accountTable = new Sheet("17FqI3CWAc407PEIFzVMAGH2IGbtK6CoHliI-MQVQ7s0");
+    var accounts = accountTable.readFromSheet("accounts");
+    for (var key in accounts) {
+      if (accounts[key].user_email == department.emaildepartment) {
+        return accounts[key].user_sheet_id;
+      }
+    }
+    // якщо не має кафедри в списку зареєстрованих, зареєструвати
+    return this.createDepartmentRecordForTable(department, accountTable);;
   };
 }

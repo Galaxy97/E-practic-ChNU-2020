@@ -4,7 +4,8 @@ function include(filename) {
 
 function getUserInfo() {
   // var email = Session.getActiveUser().getEmail();
-  var email = "nf@vu.cdu.edu.ua";
+  // var email = "nf@vu.cdu.edu.ua";
+  var email = "infoteh@vu.cdu.edu.ua";
   var accountTable = new Sheet("17FqI3CWAc407PEIFzVMAGH2IGbtK6CoHliI-MQVQ7s0");
   var accounts = accountTable.readFromSheet("accounts");
   for (var row in accounts) {
@@ -21,6 +22,10 @@ function getExternalData() {
   } catch (error) {
     return new Error("fail from load file");
   }
+}
+function findDepartmentSheet(instititeID) {
+  var uZver = new Users();
+  return uZver.findByInstitutes(instititeID);
 }
 
 function getDataFromTable(sheetID) {

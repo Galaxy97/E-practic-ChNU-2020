@@ -1,6 +1,7 @@
 function doGet() {
   // var email = Session.getActiveUser().getEmail(); // services => see
-  var email = "nf@vu.cdu.edu.ua";
+  // var email = "nf@vu.cdu.edu.ua";
+  var email = "infoteh@vu.cdu.edu.ua";
   var template;
   var accountTable = new Sheet("17FqI3CWAc407PEIFzVMAGH2IGbtK6CoHliI-MQVQ7s0");
   var accounts = accountTable.readFromSheet("accounts");
@@ -13,7 +14,7 @@ function doGet() {
           template = HtmlService.createTemplateFromFile("frontend/templates/department"); // сторінка для кафедри
           break;
         case "inst":
-          template = HtmlService.createTemplateFromFile("frontend/templates/institute"); // сторінка для інституту
+          template = HtmlService.createTemplateFromFile("frontend/templates/institutes"); // сторінка для інституту
           break;
         case "admin":
           template = HtmlService.createTemplateFromFile("frontend/templates/admin"); // сторінка для адміна
