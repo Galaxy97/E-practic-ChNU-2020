@@ -1,9 +1,36 @@
 function Sheet(id) {
   this.sheet = SpreadsheetApp.openById(id);
 
-  this.readFromSheet = function(sheetName) {
-    var sheet = this.sheet.getSheetByName(sheetName);
+  this.readRowById = function(sheetName, id) {
     try {
+      var sheet = this.sheet.getSheetByName(sheetName);
+      var keys = this.getKeys(sheet);
+      if (!keys) return undefined;
+      for (var key = 0; key < keys.length; key++) {
+        if (keys[key] == "id") {
+          var rows = sheet.getRange(2, key + 1, sheet.getLastRow()).getValues();
+          for (var row = 0; row < rows.length; row++) {
+            var obj = {};
+            if (rows[row] == id) {
+              var rowData = sheet.getRange(row + 2, 1, 1, sheet.getLastColumn()).getValues();
+              keys.forEach(function(key, index){
+                obj[key] = rowData[0][index];
+              })
+              return obj;
+            }
+          }
+          return undefined;
+          break;
+        }
+      }
+    } catch (error) {
+      new Error("error read id:" + id);
+    }
+  };
+
+  this.readFromSheet = function(sheetName) {
+    try {
+      var sheet = this.sheet.getSheetByName(sheetName);
       var keys = this.getKeys(sheet);
       if (keys) {
         var rows = sheet.getRange(1, 1, sheet.getLastRow(), sheet.getLastColumn()).getValues();
@@ -93,36 +120,8 @@ function Sheet(id) {
   };
 }
 
-//function test() {
-//var sheet = new Sheet('1dfeF672k3WmlejytuHIQ2Pea_BzLXJQrLju3qfOsbXM');
-//sheet.writeInSheet("main", {
-//    code: false,
-//    user_email: "nf@vu.cdu.edu.ua",
-//    institutes: 1,
-//    departments: 3,
-//    educational_degree: "1",
-//    form_of_training: "2",
-//    termin: "on",
-//    specialty: "80",
-//    academic_discipline: false,
-//    typepractice: "1",
-//    rulespractice: "1",
-//    course_number: "1",
-//    semester_number: "2",
-//    period: "qew",
-//    hours: "qwe",
-//    date_launch: "2019-12-30",
-//    date_end: "2019-12-30",
-//    numbers_of_student: "asd",
-//    type_of_control: "1",
-//    responsible: "123231",
-//    deadline: "2019-12-30",
-//    valid: false,
-//    id: 1577707616011
-//  });
-//}
 function test() {
-  var sheet = new Sheet("1dfeF672k3WmlejytuHIQ2Pea_BzLXJQrLju3qfOsbXM");
-  var a = sheet.deleteRowFromSheet("main", 1577664000000);
+  var sheet = new Sheet("1PhgGe8ZlGzgI-qVX_s0PYRHvstVyOYY9zN48g4AW46M");
+  var a = sheet.readRowById("main", '1577785954242');
   Logger.log(a);
 }

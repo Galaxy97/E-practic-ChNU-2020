@@ -6,6 +6,7 @@ function getUserInfo() {
   // var email = Session.getActiveUser().getEmail();
   // var email = "nf@vu.cdu.edu.ua";
   var email = "infoteh@vu.cdu.edu.ua";
+  // var email = "nmv@vu.cdu.edu.ua";
   var accountTable = new Sheet("17FqI3CWAc407PEIFzVMAGH2IGbtK6CoHliI-MQVQ7s0");
   var accounts = accountTable.readFromSheet("accounts");
   for (var row in accounts) {
@@ -53,4 +54,48 @@ function deleteRecordInTable(sheetID, name, id) {
   } catch (error) {
     return false;
   }
+}
+function createCode(userInfo, id, prefix) {
+  var sheet = new Sheet(userInfo.user_sheet_id);
+  var data = sheet.readRowById("main", id);
+  var code = createShufr(prefix); // створення шифру
+  // присвоєня шифру та погодження в таблиці графіку
+  data.code = code;
+  data.valid = true;
+  sheet.writeInSheet('main', data, id); // запис цих змін в таблиці
+  // створення об'єкту для запису order даних
+  var practicData = {};
+  practicData.id = code;
+  practicData.confDateTime = false;
+  practicData.orderUrl = false;
+  practicData.additionUrl = false;
+  sheet.writeInSheet('order', practicData); // запис цих даних в таблицю order
+
+  // створення тиблиці з назвою як шифр
+  sheet.sheet.insertSheet(code);
+  return code;
+}
+
+function createShufr(prefix) {
+  var sheet = SpreadsheetApp.openById("17FqI3CWAc407PEIFzVMAGH2IGbtK6CoHliI-MQVQ7s0").getSheetByName("instituteCode");
+  var lastCode = sheet.getRange(1, 1).getValue() + 1;
+  var numCode;
+  if (lastCode < 10) {
+    numCode = "000" + lastCode;
+  } else if (lastCode < 100) {
+    numCode = "00" + lastCode;
+  } else if (lastCode < 1000) {
+    numCode = "0" + lastCode;
+  } else {
+    numCode = lastCode;
+  }
+  sheet.getRange(1, 1).setValue(lastCode);
+  var date = new Date();
+  var years;
+  var year1 = date.getFullYear();
+  var year2;
+  if (date.getMonth < 5) {
+    year2 = String(year1 - 1);
+  } else year2 = String(year1 + 1);
+  return prefix + '-' + String(year1).slice(2) + '/' + year2.slice(2) + '-' + numCode;
 }

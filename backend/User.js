@@ -75,6 +75,6 @@ function Users() {
       }
     }
     // якщо не має кафедри в списку зареєстрованих, зареєструвати
-    return this.createDepartmentRecordForTable(department, accountTable);;
+    return this.createDepartmentRecordForTable(department, accountTable);
   };
 }

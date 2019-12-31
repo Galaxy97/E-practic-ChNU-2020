@@ -22,7 +22,6 @@
           userInfo.user_sheet_id = res;
           getDateFromTable(res)
             .then(result => {
-              // console.log(result);
               if (result) {
                 createTableHTML(JSON.parse(result));
               } else createTableHTML();

@@ -268,8 +268,14 @@
     });
 
     // create edit buttons
-    if (rowData.valid) {
-    } else tr.append(createGrapEditButton(tr, rowData));
+    if (userInfo.type == "dep" || userInfo.type == "inst") {
+      if (rowData.valid) {
+        tr.append(createGrapFollowButton(rowData));
+      } else tr.append(createGrapEditButton(tr, rowData));
+    } else {
+      tr.append(createGrapEditButton(tr, rowData));
+    }
+
     return tr;
   }
 
@@ -322,6 +328,74 @@
           });
       }
     };
+    if (userInfo.type == "dep" || userInfo.type == "inst") return td;
+    // create agree btns for admin
+    if (rowData.valid) {
+      td.append(createGrapFollowButton(rowData));
+      // to disagree
+      td.append(createDisAgreeBtn(tr, rowData));
+    } else {
+      // to agree
+      td.append(createAgreeBtn(tr, rowData));
+    }
     return td;
   }
+
+  function createDisAgreeBtn(tr, rowData) {
+    const disAgreeBtn = document.createElement("button");
+    disAgreeBtn.innerText = "відмінити погодження";
+    disAgreeBtn.onclick = () => {
+      disAgreeGraph(tr, rowData);
+    };
+    return disAgreeBtn;
+  }
+  function createAgreeBtn(tr, rowData) {
+    const agreeBtn = document.createElement("button");
+    agreeBtn.innerText = "погодити";
+    agreeBtn.onclick = () => {
+      agreeGraph(tr, rowData);
+    };
+    return agreeBtn;
+  }
+
+  function createGrapFollowButton(tr, rowData) {
+    const goToOrder = document.createElement("button");
+    goToOrder.innerText = "до наказу";
+    goToOrder.onclick = () => {
+    };
+    return goToOrder;
+  }
+
+  function agreeGraph(tr, rowData) {
+    if (!rowData.code) {
+      // create code
+      (async () => {
+        try {
+          const code = await createCode(
+            userInfo,
+            rowData.id,
+            externalData.handBook.institutes[userInfo.institute_id].prefixinstitute
+          );
+          rowData.code = code;
+        } catch (error) {
+          alert(error);
+          failedMesseage(error);
+        }
+      })();
+    }
+    rowData.valid = true;
+    if (sendDataToSheet(userInfo.user_sheet_id, rowData, rowData.id)) {
+      // додати ці дані в таблицю та відмалювати
+      createRowShowRecord(rowData, tr);
+    } else failedMesseage();
+  }
+
+  function disAgreeGraph(tr, rowData) {
+    rowData.valid = false;
+    if (sendDataToSheet(userInfo.user_sheet_id, rowData, rowData.id)) {
+      // додати ці дані в таблицю та відмалювати
+      createRowShowRecord(rowData, tr);
+    } else failedMesseage();
+  }
+  
 </script>

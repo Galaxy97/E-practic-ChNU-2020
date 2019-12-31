@@ -1,0 +1,53 @@
+<script>
+  function createMainWindow() {
+    const instSelect = document.createElement("select");
+    document.getElementById("choose").append(instSelect);
+
+    instSelect.append(createDefaulteOption());
+    for (const key in externalData.handBook.institutes) {
+      const value = externalData.handBook.institutes[key][externalData.objectKeys.institutes.value];
+      const text = externalData.handBook.institutes[key][externalData.objectKeys.institutes.text];
+      instSelect.append(createOption(value, text));
+    }
+
+    instSelect.onchange = () => {
+      const value = instSelect.options[instSelect.selectedIndex].value;
+      userInfo.institute_id = value;
+
+      const depSelect = document.createElement("select");
+      document.getElementById("choose").append(depSelect);
+      depSelect.append(createDefaulteOption());
+      const sortDataArr = sortData(
+        externalData.handBook.departments,
+        userInfo.institute_id,
+        externalData.objectKeys.departments
+      );
+      for (const key in sortDataArr) {
+        const value = sortDataArr[key][externalData.objectKeys.departments.value];
+        const text = sortDataArr[key][externalData.objectKeys.departments.text];
+        depSelect.append(createOption(value, text));
+      }
+      depSelect.onchange = () => {
+        const value = depSelect.options[depSelect.selectedIndex].value;
+        userInfo.department_id = value;
+        findDepartmentSheet(value)
+          .then(res => {
+            // get data from user-table-sheets
+            userInfo.user_sheet_id = res;
+            getDateFromTable(res)
+              .then(result => {
+                if (result) {
+                  createTableHTML(JSON.parse(result));
+                } else createTableHTML();
+              })
+              .catch(error => {
+                failedMesseage(error);
+              });
+          })
+          .catch(e => {
+            failedMesseage(e);
+          });
+      };
+    };
+  }
+</script>

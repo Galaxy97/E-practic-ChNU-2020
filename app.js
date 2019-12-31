@@ -2,6 +2,7 @@ function doGet() {
   // var email = Session.getActiveUser().getEmail(); // services => see
   // var email = "nf@vu.cdu.edu.ua";
   var email = "infoteh@vu.cdu.edu.ua";
+  // var email = "nmv@vu.cdu.edu.ua";
   var template;
   var accountTable = new Sheet("17FqI3CWAc407PEIFzVMAGH2IGbtK6CoHliI-MQVQ7s0");
   var accounts = accountTable.readFromSheet("accounts");
