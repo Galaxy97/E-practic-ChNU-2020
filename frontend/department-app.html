@@ -3,7 +3,12 @@
     // get data from user-table-sheets
     getDateFromTable(userInfo.user_sheet_id)
       .then(res => {
-        createTableHTML(JSON.parse(res));
+        try {
+          res = JSON.parse(res)
+        } catch (error) {
+          res = undefined
+        }
+        createTableHTML(res);
       })
       .catch(error => {
         failedMesseage(error);

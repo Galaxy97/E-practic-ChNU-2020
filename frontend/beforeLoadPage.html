@@ -1,10 +1,10 @@
 <script>
   let userInfo = {};
   let externalData = {};
+  const tableDate = {};
   // load information about user
   getUserInfo()
     .then(res => {
-      console.log(res);
       userInfo = res;
       successfulMesseage("дані прийшли");
       // читання довідників з локал сторидж або завантаження з серверу, якщо не має

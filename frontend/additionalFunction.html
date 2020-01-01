@@ -1,0 +1,39 @@
+<script>
+  function goToAdditionalFunc(code) {
+    getDateFromTable(userInfo.user_sheet_id, code)
+      .then(res => {
+        try {
+          res = JSON.parse(res);
+        } catch (error) {
+          res = undefined;
+        }
+        document.getElementById("backToGraph").remove();
+        document.getElementById("table").remove();
+        document.getElementById("main").append(createAdditionalTable(res));
+      })
+      .catch(e => {
+        failedMesseage(e);
+      });
+  }
+  function createAdditionalTable(dodatokData) {
+    const table = document.createElement("table");
+    table.id = "table";
+
+    // table.append(createTableHeaders());
+    // table.append(createTableBody(orderData));
+    const back = document.createElement("button");
+    back.innerText = "Повернутись до наказу???";
+    back.onclick = () => {
+      back.remove();
+      // show graph table
+      const arr = [];
+      for (const key in tableDate) {
+        arr.push(tableDate[key]);
+      }
+      document.getElementById("table").remove();
+      document.getElementById("main").append(createOrderDataTable(orderData));
+    };
+    document.getElementById("content").append(back);
+    return table;
+  }
+</script>

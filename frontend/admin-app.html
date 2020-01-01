@@ -15,6 +15,8 @@
       userInfo.institute_id = value;
 
       const depSelect = document.createElement("select");
+      depSelect.id = "departSelect";
+      if (document.getElementById("departSelect")) document.getElementById("departSelect").remove();
       document.getElementById("choose").append(depSelect);
       depSelect.append(createDefaulteOption());
       const sortDataArr = sortData(

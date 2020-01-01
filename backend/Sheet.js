@@ -110,7 +110,7 @@ function Sheet(id) {
         var allData = sheet.getRange(2, index + 1, sheet.getLastRow()).getValues();
         allData.forEach(function(row, ind) {
           if (row[0] == id) {
-            sheet.deleteRow(ind + 1);
+            sheet.deleteRow(ind + 2);
             return true;
           }
         });

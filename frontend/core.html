@@ -1,5 +1,4 @@
 <script>
-  const tableData = {};
   function createTableHTML(sheetData) {
     // create table
     const table = document.createElement("table");
@@ -11,10 +10,10 @@
     table.append(headerRow);
     if (sheetData) {
       for (const rowData of sheetData) {
+        tableDate[rowData.id] = rowData;
         table.append(createRowShowRecord(rowData));
       }
     }
-
     createBtnNewGraph();
   }
 </script>

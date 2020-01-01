@@ -220,7 +220,8 @@
           }
         }
       }
-      if (sendDataToSheet(userInfo.user_sheet_id, thisRecorData)) {
+      if (sendDataToSheet(userInfo.user_sheet_id, "main", thisRecorData)) {
+        tableDate[thisRecorData.id] = thisRecorData;
         // додати ці дані в таблицю та відмалювати
         document.getElementById("table").append(createRowShowRecord(thisRecorData));
         tr.remove();
@@ -270,7 +271,7 @@
     // create edit buttons
     if (userInfo.type == "dep" || userInfo.type == "inst") {
       if (rowData.valid) {
-        tr.append(createGrapFollowButton(rowData));
+        tr.append(createGrapFollowButton(tr, rowData));
       } else tr.append(createGrapEditButton(tr, rowData));
     } else {
       tr.append(createGrapEditButton(tr, rowData));
@@ -301,7 +302,8 @@
             }
           }
         }
-        if (sendDataToSheet(userInfo.user_sheet_id, editRecord, editRecord.id)) {
+        if (sendDataToSheet(userInfo.user_sheet_id, "main", editRecord, editRecord.id)) {
+          tableDate[editRecord.id] = editRecord;
           // додати ці дані в таблицю та відмалювати
           createRowShowRecord(editRecord, tr);
         } else failedMesseage();
@@ -319,7 +321,7 @@
     td.append(deleteBtn);
     deleteBtn.onclick = () => {
       if (confirm("Ви хочете видалити графік?")) {
-        deleteRecordInTable(userInfo.user_sheet_id, "main", rowData.id)
+        deleteRecordInTable(userInfo.user_sheet_id, "main", rowData.id, rowData.code)
           .then(() => {
             tr.remove();
           })
@@ -331,7 +333,7 @@
     if (userInfo.type == "dep" || userInfo.type == "inst") return td;
     // create agree btns for admin
     if (rowData.valid) {
-      td.append(createGrapFollowButton(rowData));
+      td.append(createGrapFollowButton(tr, rowData));
       // to disagree
       td.append(createDisAgreeBtn(tr, rowData));
     } else {
@@ -362,6 +364,7 @@
     const goToOrder = document.createElement("button");
     goToOrder.innerText = "до наказу";
     goToOrder.onclick = () => {
+      goToOrderFunc(rowData.code);
     };
     return goToOrder;
   }
@@ -384,7 +387,7 @@
       })();
     }
     rowData.valid = true;
-    if (sendDataToSheet(userInfo.user_sheet_id, rowData, rowData.id)) {
+    if (sendDataToSheet(userInfo.user_sheet_id, "main", rowData, rowData.id)) {
       // додати ці дані в таблицю та відмалювати
       createRowShowRecord(rowData, tr);
     } else failedMesseage();
@@ -397,5 +400,4 @@
       createRowShowRecord(rowData, tr);
     } else failedMesseage();
   }
-  
 </script>

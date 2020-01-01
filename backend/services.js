@@ -28,28 +28,40 @@ function findDepartmentSheet(instititeID) {
   var uZver = new Users();
   return uZver.findByInstitutes(instititeID);
 }
-
-function getDataFromTable(sheetID) {
+function getDateFromTableById(sheetID, tableName, id) {
   var sheet = new Sheet(sheetID);
   try {
-    return JSON.stringify(sheet.readFromSheet("main"));
+    return JSON.stringify(sheet.readRowById(tableName, id));
   } catch (e) {
     return e;
   }
 }
-function sendDataToSheet(sheetID, record, id) {
+
+function getDataFromTable(sheetID, tableName) {
   var sheet = new Sheet(sheetID);
   try {
-    sheet.writeInSheet("main", JSON.parse(record), id);
+    return JSON.stringify(sheet.readFromSheet(tableName));
+  } catch (e) {
+    return e;
+  }
+}
+function sendDataToSheet(sheetID, sheetName, record, id) {
+  var sheet = new Sheet(sheetID);
+  try {
+    sheet.writeInSheet(sheetName, JSON.parse(record), id);
     return true;
   } catch (error) {
     return false;
   }
 }
-function deleteRecordInTable(sheetID, name, id) {
+function deleteRecordInTable(sheetID, name, id, code) {
   var sheet = new Sheet(sheetID);
   try {
     sheet.deleteRowFromSheet(name, id);
+    if (code) {
+      sheet.sheet.deleteSheet(sheet.sheet.getSheetByName(code));
+      sheet.deleteRowFromSheet("order", code);
+    }
     return true;
   } catch (error) {
     return false;
@@ -62,14 +74,15 @@ function createCode(userInfo, id, prefix) {
   // присвоєня шифру та погодження в таблиці графіку
   data.code = code;
   data.valid = true;
-  sheet.writeInSheet('main', data, id); // запис цих змін в таблиці
+  sheet.writeInSheet("main", data, id); // запис цих змін в таблиці
   // створення об'єкту для запису order даних
   var practicData = {};
   practicData.id = code;
-  practicData.confDateTime = false;
+  practicData.confDate = false;
+  practicData.confTime = false;
   practicData.orderUrl = false;
   practicData.additionUrl = false;
-  sheet.writeInSheet('order', practicData); // запис цих даних в таблицю order
+  sheet.writeInSheet("order", practicData); // запис цих даних в таблицю order
 
   // створення тиблиці з назвою як шифр
   sheet.sheet.insertSheet(code);
@@ -97,5 +110,5 @@ function createShufr(prefix) {
   if (date.getMonth < 5) {
     year2 = String(year1 - 1);
   } else year2 = String(year1 + 1);
-  return prefix + '-' + String(year1).slice(2) + '/' + year2.slice(2) + '-' + numCode;
+  return prefix + "-" + String(year1).slice(2) + "/" + year2.slice(2) + "-" + numCode;
 }

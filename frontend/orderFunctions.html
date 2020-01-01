@@ -1,0 +1,170 @@
+<script>
+  let orderData = {};
+  function goToOrderFunc(id) {
+    getDateFromTableById(userInfo.user_sheet_id, "order", id)
+      .then(res => {
+        try {
+          res = JSON.parse(res);
+        } catch (error) {
+          res = undefined;
+        }
+        document.getElementById("table").remove();
+        document.getElementById("main").append(createOrderDataTable(res));
+      })
+      .catch(e => {
+        failedMesseage(e);
+      });
+  }
+
+  function createOrderDataTable(order) {
+    orderData = order;
+    const table = document.createElement("table");
+    table.id = "table";
+
+    table.append(createTableHeaders());
+    table.append(createTableBody(order));
+
+    const back = document.createElement("button");
+    back.innerText = "Повернутись до графіків";
+    back.id = "backToGraph";
+    back.onclick = () => {
+      back.remove();
+      // show graph table
+      const arr = [];
+      for (const key in tableDate) {
+        arr.push(tableDate[key]);
+      }
+      createTableHTML(arr);
+    };
+    document.getElementById("content").append(back);
+    return table;
+  }
+
+  function createTableHeaders() {
+    const tr = document.createElement("tr");
+
+    let th = document.createElement("th");
+    tr.append(th);
+    th.innerText = "Номер наказу";
+
+    th = document.createElement("th");
+    tr.append(th);
+    th.innerText = "Дата настановчої конференції";
+    th = document.createElement("th");
+    tr.append(th);
+    th.innerText = "Час настановчої конференції";
+    th = document.createElement("th");
+    tr.append(th);
+    th.innerText = "Наказ";
+    th = document.createElement("th");
+    tr.append(th);
+    th.innerText = "Додаток";
+    return tr;
+  }
+  function createTableBody(orderData) {
+    console.log(orderData);
+    let tr = document.createElement("tr");
+    // ---------------------------------- CODE
+    let td = document.createElement("td");
+    td.innerText = orderData.id;
+    tr.append(td);
+    // ---------------------------------- END CODE
+    // ---------------------------------- DATE
+    td = document.createElement("td");
+    const date = document.createElement("input");
+    date.type = "date";
+    date.onchange = () => {
+      orderData.confDate = String(new Date(date.value).getTime());
+      sendDataToSheet(userInfo.user_sheet_id, "order", orderData, orderData.id)
+        .then()
+        .catch(e => {
+          failedMesseage(e);
+        });
+    };
+    date.value = parseDateFromDate(orderData.confDate);
+    td.append(date);
+    tr.append(td);
+    // ---------------------------------- END DATE
+    // ---------------------------------- TIME
+    td = document.createElement("td");
+    const time = document.createElement("input");
+    time.type = "time";
+    time.onchange = () => {
+      orderData.confTime = String(time.value.slice(0, 2) + "$" + time.value.slice(3));
+      sendDataToSheet(userInfo.user_sheet_id, "order", orderData, orderData.id)
+        .then()
+        .catch(e => {
+          failedMesseage(e);
+        });
+    };
+    time.value = orderData.confTime.slice(0, 2) + ":" + orderData.confTime.slice(3);
+    td.append(time);
+    tr.append(td);
+    // ---------------------------------- END TIME
+
+    // ------------------------------------ ORDER
+    td = document.createElement("td");
+    if (orderData.orderUrl) {
+      var btnLink = document.createElement("button");
+      btnLink.innerText = "перейти";
+      var link = document.createElement("form");
+      link.append(btnLink);
+      link.target = "_blank";
+      link.action = orderData.orderUrl;
+      td.append(link);
+      var btnUpdate = document.createElement("button");
+      td.append(btnUpdate);
+      btnUpdate.innerText = "оновити наказ";
+      btnUpdate.onclick = () => {
+        alert("ти вирішив це переписать");
+      };
+    } else {
+      var btnCreate = document.createElement("button");
+      td.append(btnCreate);
+      btnCreate.innerText = "створити наказ";
+      btnCreate.onclick = () => {
+        alert("ти вирішив це написати заново");
+      };
+    }
+    tr.append(td);
+    // ------------------------------------ END ORDER
+    /// ----------------------------------- ADDITIONAL
+    td = document.createElement("td");
+    if (orderData.additionUrl) {
+      var btnLink = document.createElement("button");
+      btnLink.innerText = "перейти";
+      var link = document.createElement("form");
+      link.append(btnLink);
+      link.target = "_blank";
+      link.action = orderData.orderUrl;
+      td.append(link);
+      var btnUpdate = document.createElement("button");
+      td.append(btnUpdate);
+      btnUpdate.innerText = "оновити додаток";
+      btnUpdate.onclick = () => {
+        alert("ти вирішив це переписать");
+      };
+    } else {
+      var btnCreate = document.createElement("button");
+      td.append(btnCreate);
+      btnCreate.innerText = "створити додаток";
+      btnCreate.onclick = () => {
+        alert("ти вирішив це написати заново");
+      };
+    }
+    var btnEditAdditional = document.createElement("button");
+    td.append(btnEditAdditional);
+    btnEditAdditional.innerText = "редагувати додаток";
+    btnEditAdditional.onclick = () => {
+      goToAdditionalFunc(orderData.id);
+    };
+    tr.append(td);
+    /// ----------------------------------- END ADDITIONAL
+    return tr;
+  }
+
+  function parseDateFromDate(unixTime) {
+    if (!unixTime) return false;
+    return new Date(unixTime).toISOString().slice(0, 10);
+  }
+</script>
