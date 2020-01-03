@@ -7,20 +7,46 @@
         } catch (error) {
           res = undefined;
         }
+        const dodatok = {
+          key: [],
+          value: [],
+          body: {}
+        };
+        for (const ki in res[0]) {
+          dodatok.key.push(ki);
+          dodatok.value.push(res[0][ki]);
+        }
         document.getElementById("backToGraph").remove();
         document.getElementById("table").remove();
-        document.getElementById("main").append(createAdditionalTable(res));
+        document.getElementById("main").append(createAdditionalTable(dodatok));
       })
       .catch(e => {
         failedMesseage(e);
       });
   }
-  function createAdditionalTable(dodatokData) {
+  function createAdditionalTable(dodatok) {
     const table = document.createElement("table");
-    table.id = "table";
+    const dodatokData = {};
+    if (dodatok) {
+      console.log(dodatok);
+      dodatokData.headersKey = dodatok.key;
+      dodatokData.headersValue = dodatok.value;
+      // dodatokData.body = dodatok.body;
+    } else {
+      dodatokData.headersKey = ["student", "captain", "basePractic", "headOfPractic"];
+      dodatokData.headersValue = ["Cтудент", "Чи староста", "База практики", "Керівник практики"];
+    }
 
-    // table.append(createTableHeaders());
-    // table.append(createTableBody(orderData));
+    table.id = "table";
+    // create headers div
+    // console.log(dodatokData.headersKey, dodatokData.headersValue);
+    // if (dodatok.body) table.append(createHeadersBlok(dodatokData.headersKey, dodatokData.headersValue, true));
+    // else
+    table.append(createHeadersBlok(dodatokData.headersKey, dodatokData.headersValue));
+    // create body divs
+
+    // create new record div
+
     const back = document.createElement("button");
     back.innerText = "Повернутись до наказу???";
     back.onclick = () => {
@@ -35,5 +61,146 @@
     };
     document.getElementById("content").append(back);
     return table;
+  }
+
+  function createHeadersBlok(headers, values, block) {
+    const tr = document.createElement("tr");
+    if (block) {
+      headers.forEach((element, index) => {
+        const th = document.createElement("th");
+        tr.append(th);
+        th.innerHTML = values[index];
+      });
+    } else {
+      headers.forEach((element, index) => {
+        const th = document.createElement("th");
+        tr.append(th);
+
+        if (element == "student" || element == "captain" || element == "basePractic") {
+          th.innerHTML = values[index];
+        } else {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.value = values[index];
+          th.append(input);
+          if (element != "headOfPractic") {
+            th.id = element;
+            // -----------------------------
+            const btnDelete = document.createElement("button");
+            btnDelete.innerText = "видалити";
+            th.append(btnDelete);
+            btnDelete.onclick = () => {
+              for (let index = 0; index < headers.length; index++) {
+                if (th.id === headers[index]) {
+                  headers.splice(index, 1);
+                  values.splice(index, 1);
+                  break;
+                }
+              }
+              reWriteKeys(userInfo.user_sheet_id, orderData.id, headers, values)
+                .then(() => {
+                  successfulMesseage("поле видалено");
+                })
+                .catch(e => {
+                  failedMesseage(e);
+                });
+
+              th.remove();
+            };
+            // -----------------------------
+          }
+        }
+      });
+      // fild add new unit
+      const th = document.createElement("th");
+      tr.append(th);
+      const btnAdd = document.createElement("button");
+      th.append(btnAdd);
+      btnAdd.innerText = "Додати нове поле";
+      btnAdd.onclick = () => {
+        const newTh = document.createElement("th");
+        th.parentNode.insertBefore(newTh, th);
+        const select = document.createElement("select");
+        newTh.append(select);
+        select.append(createDefaulteOption());
+        for (const key in externalData.handBook.departments) {
+          const value = externalData.handBook.departments[key][externalData.objectKeys.departments.value];
+          const text = externalData.handBook.departments[key][externalData.objectKeys.departments.text];
+          select.append(createOption(value, text));
+        }
+        const newInput = document.createElement("input");
+        newTh.append(newInput);
+        newInput.type = "text";
+        const btnSave = document.createElement("button");
+        btnSave.innerText = "зберегти";
+        newTh.append(btnSave);
+        btnSave.onclick = () => {
+          if (!select.options[select.selectedIndex].value) {
+            alert("Оберіть кафедру керівника");
+            return;
+          }
+          if (!newInput.value) {
+            alert("Введіть керівника");
+            return;
+          }
+          if (newTh.id) {
+            for (let index = 0; index < headers.length; index++) {
+              if (newTh.id === headers[index]) {
+                if (newTh.id.slice(4, newTh.id.indexOf("-", 4)) != select.options[select.selectedIndex].value) {
+                  let oldNum = newTh.id.slice(4);
+                  oldNum = oldNum.slice(oldNum.indexOf("-"));
+                  const newKey = `key-${select.options[select.selectedIndex].value}${oldNum}`;
+                  headers[index] = newKey;
+                  newTh.id = newKey;
+                }
+                if (values[index] != newInput.value) {
+                  values[index] = newInput.value;
+                }
+                break;
+              }
+            }
+          } else {
+            let i = 0;
+            let newKey;
+            do {
+              newKey = `key-${select.options[select.selectedIndex].value}-${++i}`;
+            } while (headers.indexOf(newKey) != -1);
+            newTh.id = newKey;
+            headers.push(newKey);
+            values.push(newInput.value);
+          }
+          reWriteKeys(userInfo.user_sheet_id, orderData.id, headers, values)
+            .then(() => {
+              successfulMesseage("ключі перезаписані");
+            })
+            .catch(e => {
+              failedMesseage(e);
+            });
+        };
+        const btnDelete = document.createElement("button");
+        btnDelete.innerText = "видалити";
+        newTh.append(btnDelete);
+        btnDelete.onclick = () => {
+          if (newTh.id) {
+            for (let index = 0; index < headers.length; index++) {
+              if (newTh.id === headers[index]) {
+                headers.splice(index, 1);
+                values.splice(index, 1);
+                break;
+              }
+            }
+            reWriteKeys(userInfo.user_sheet_id, orderData.id, headers, values)
+              .then(() => {
+                successfulMesseage("поле видалено");
+              })
+              .catch(e => {
+                failedMesseage(e);
+              });
+          }
+          newTh.remove();
+        };
+      };
+    }
+    return tr;
   }
 </script>

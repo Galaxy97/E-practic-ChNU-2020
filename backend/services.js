@@ -54,6 +54,15 @@ function sendDataToSheet(sheetID, sheetName, record, id) {
     return false;
   }
 }
+function reWriteKeys(sheetID, sheetName, headers, values) {
+  var sheet = new Sheet(sheetID);
+  try {
+    sheet.writeNewKeysAndValue(sheetName, headers, values);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
 function deleteRecordInTable(sheetID, name, id, code) {
   var sheet = new Sheet(sheetID);
   try {

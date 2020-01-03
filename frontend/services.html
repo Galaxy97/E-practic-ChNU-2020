@@ -24,6 +24,14 @@
         .getUserInfo();
     });
   }
+  function reWriteKeys(tableId, tableName, headers, values) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .reWriteKeys(tableId, tableName, headers, values);
+    });
+  }
   function findDepartmentSheet(instititeID) {
     return new Promise((resolve, reject) => {
       google.script.run

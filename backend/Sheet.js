@@ -13,9 +13,9 @@ function Sheet(id) {
             var obj = {};
             if (rows[row] == id) {
               var rowData = sheet.getRange(row + 2, 1, 1, sheet.getLastColumn()).getValues();
-              keys.forEach(function(key, index){
+              keys.forEach(function(key, index) {
                 obj[key] = rowData[0][index];
-              })
+              });
               return obj;
             }
           }
@@ -72,12 +72,18 @@ function Sheet(id) {
           allData.forEach(function(row, ind) {
             if (row[0] == id) {
               sheet.getRange(ind + 2, 1, 1, array.length).setValues([array]);
-              return true;
             }
           });
         }
       });
     } else sheet.appendRow(array);
+  };
+  this.writeNewKeysAndValue = function(sheetName, headers, values) {
+    var sheet = this.sheet.getSheetByName(sheetName);
+    sheet.deleteRow(1);
+    sheet.deleteRow(2);
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.getRange(2, 1, 1, values.length).setValues([values]);
   };
 
   this.getKeys = function(sheet) {
@@ -122,6 +128,6 @@ function Sheet(id) {
 
 function test() {
   var sheet = new Sheet("1PhgGe8ZlGzgI-qVX_s0PYRHvstVyOYY9zN48g4AW46M");
-  var a = sheet.readRowById("main", '1577785954242');
+  var a = sheet.readRowById("main", "1577785954242");
   Logger.log(a);
 }
