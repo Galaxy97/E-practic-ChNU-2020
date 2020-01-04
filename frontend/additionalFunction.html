@@ -7,18 +7,26 @@
         } catch (error) {
           res = undefined;
         }
-        const dodatok = {
-          key: [],
-          value: [],
-          body: {}
-        };
-        for (const ki in res[0]) {
-          dodatok.key.push(ki);
-          dodatok.value.push(res[0][ki]);
-        }
         document.getElementById("backToGraph").remove();
         document.getElementById("table").remove();
-        document.getElementById("main").append(createAdditionalTable(dodatok));
+        const dodatok = {
+          key: [],
+          value: []
+        };
+        console.log(res);
+        if (res) {
+          for (const ki in res[0]) {
+            dodatok.key.push(ki);
+            dodatok.value.push(res[0][ki]);
+          }
+          if (res.length > 1) {
+            dodatok.body = [];
+            for (let i = 1; i < res.length; i++) {
+              dodatok.body.push(res[i]);
+            }
+          }
+          document.getElementById("main").append(createAdditionalTable(dodatok));
+        } else document.getElementById("main").append(createAdditionalTable());
       })
       .catch(e => {
         failedMesseage(e);
@@ -31,21 +39,22 @@
       console.log(dodatok);
       dodatokData.headersKey = dodatok.key;
       dodatokData.headersValue = dodatok.value;
-      // dodatokData.body = dodatok.body;
     } else {
-      dodatokData.headersKey = ["student", "captain", "basePractic", "headOfPractic"];
-      dodatokData.headersValue = ["Cтудент", "Чи староста", "База практики", "Керівник практики"];
+      dodatokData.headersKey = ["student", "captain", "basePractic", "headOfPractic", "id"];
+      dodatokData.headersValue = ["Cтудент", "Чи староста", "База практики", "Керівник практики", "id"];
     }
-
     table.id = "table";
     // create headers div
-    // console.log(dodatokData.headersKey, dodatokData.headersValue);
-    // if (dodatok.body) table.append(createHeadersBlok(dodatokData.headersKey, dodatokData.headersValue, true));
-    // else
-    table.append(createHeadersBlok(dodatokData.headersKey, dodatokData.headersValue));
-    // create body divs
-
+    if (dodatok.hasOwnProperty("body")) {
+      table.append(createHeadersBlok(dodatokData.headersKey, dodatokData.headersValue, true));
+      dodatokData.body = dodatok.body;
+      // show table body
+      createBody(table, dodatokData);
+    } else {
+      table.append(createHeadersBlok(dodatokData.headersKey, dodatokData.headersValue));
+    }
     // create new record div
+    table.append(createBtnNewRecord(table, dodatokData));
 
     const back = document.createElement("button");
     back.innerText = "Повернутись до наказу???";
@@ -65,14 +74,20 @@
 
   function createHeadersBlok(headers, values, block) {
     const tr = document.createElement("tr");
+    tr.id = "headerRow";
     if (block) {
       headers.forEach((element, index) => {
+        if (element === "id") return;
         const th = document.createElement("th");
         tr.append(th);
         th.innerHTML = values[index];
       });
+      const th = document.createElement("th");
+      tr.append(th);
+      th.innerHTML = "edit place";
     } else {
       headers.forEach((element, index) => {
+        if (element === "id") return;
         const th = document.createElement("th");
         tr.append(th);
 
@@ -202,5 +217,135 @@
       };
     }
     return tr;
+  }
+
+  function createBtnNewRecord(table, dodatokData) {
+    const btnCreateRecord = document.createElement("button");
+    btnCreateRecord.innerText = "додати запис";
+    btnCreateRecord.onclick = () => {
+      btnCreateRecord.remove();
+      if (!dodatokData.hasOwnProperty("body")) {
+        reWriteKeys(userInfo.user_sheet_id, orderData.id, dodatokData.headersKey, dodatokData.headersValue)
+          .then(() => {
+            successfulMesseage("ключі перезаписані");
+          })
+          .catch(e => {
+            failedMesseage(e);
+          });
+        // remove headers and create block headers
+        document.getElementById("headerRow").remove();
+        table.append(createHeadersBlok(dodatokData.headersKey, dodatokData.headersValue, true));
+      }
+      table.append(createNewRecordRow(table, dodatokData));
+    };
+    return btnCreateRecord;
+  }
+
+  function createNewRecordRow(table, dodatokData, record, thatTr) {
+    let tr = document.createElement("tr");
+    let fill = false;
+    if (record) {
+      tr = thatTr;
+      tr.innerHTML = "";
+      fill = true;
+    } else record = {};
+    dodatokData.headersKey.forEach((element, index) => {
+      if (!fill) record[element] = false;
+      if (element === "id") return;
+      const td = document.createElement("td");
+      tr.append(td);
+      switch (element) {
+        case "captain":
+          const input = document.createElement("input");
+          td.append(input);
+          input.type = "checkbox";
+          input.onchange = () => {
+            record[element] = input.checked;
+          };
+          if (fill) input.checked = record[element] ? true : false;
+          break;
+        default:
+          const textBox = document.createElement("input");
+          td.append(textBox);
+          textBox.type = "text";
+          textBox.onchange = () => {
+            record[element] = textBox.value;
+          };
+          if (fill) {
+            console.log(record[element]);
+            textBox.value = record[element];
+          }
+          break;
+      }
+    });
+    const btnSave = document.createElement("button");
+    tr.append(btnSave);
+    btnSave.innerText = "зберегти";
+    btnSave.onclick = () => {
+      if (fill) {
+        if (sendDataToSheet(userInfo.user_sheet_id, orderData.id, record, record.id)) {
+          // додати ці дані в таблицю та відмалювати
+          tr.innerHTML = '';
+          createShowRow(table, dodatokData, tr, record);
+        } else failedMesseage();
+        console.log(record);
+      } else {
+        record.id = String(new Date().getTime());
+        if (sendDataToSheet(userInfo.user_sheet_id, orderData.id, record)) {
+          // додати ці дані в таблицю та відмалювати
+          tr.innerHTML = '';
+          createShowRow(table, dodatokData, tr, record);
+        } else failedMesseage();
+        console.log(record);
+      }
+    };
+    const btnCancel = document.createElement("button");
+    btnCancel.innerText = "відмінити";
+    tr.append(btnCancel);
+    btnCancel.onclick = () => {
+      tr.innerHTML = '';
+      createShowRow(table, dodatokData, tr, record);
+    };
+    if (!fill) return tr;
+  }
+
+  function createBody(table, dodatokData) {
+    dodatokData.body.forEach(record => {
+      const tr = document.createElement("tr");
+      createShowRow(table, dodatokData, tr, record);
+      table.append(tr);
+    });
+  }
+
+  function createShowRow(table, dodatokData, tr, record) {
+    dodatokData.headersKey.forEach((header, index) => {
+      if (header === "id") return;
+      const td = document.createElement("td");
+      tr.append(td);
+      if (header === "captain") td.innerText = record[header] ? "Так" : "Ні";
+      else td.innerText = record[header];
+    });
+    // edit row record button
+    const btnEdit = document.createElement("button");
+    tr.append(btnEdit);
+    btnEdit.innerText = "редагувати запис";
+    btnEdit.onclick = () => {
+      createNewRecordRow(table, dodatokData, record, tr);
+    };
+    // delete row  record button
+    const btnDelete = document.createElement("button");
+    tr.append(btnDelete);
+    btnDelete.innerText = "видалити запис";
+    btnDelete.onclick = () => {
+      if (confirm("Ви хочете видалити графік?")) {
+        deleteRecordInTable(userInfo.user_sheet_id, orderData.id, record.id)
+          .then(() => {
+            tr.remove();
+          })
+          .catch(e => {
+            failedMesseage(e);
+          });
+      }
+    };
   }
 </script>

@@ -80,8 +80,7 @@ function Sheet(id) {
   };
   this.writeNewKeysAndValue = function(sheetName, headers, values) {
     var sheet = this.sheet.getSheetByName(sheetName);
-    sheet.deleteRow(1);
-    sheet.deleteRow(2);
+    sheet.deleteRows(1, 2);
     sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     sheet.getRange(2, 1, 1, values.length).setValues([values]);
   };
