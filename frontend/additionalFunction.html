@@ -236,16 +236,17 @@
         document.getElementById("headerRow").remove();
         table.append(createHeadersBlok(dodatokData.headersKey, dodatokData.headersValue, true));
       }
-      table.append(createNewRecordRow(table, dodatokData));
+      const tr = document.createElement("tr");
+      table.append(tr);
+      createNewRecordRow(table, dodatokData, tr);
     };
     return btnCreateRecord;
   }
 
-  function createNewRecordRow(table, dodatokData, record, thatTr) {
-    let tr = document.createElement("tr");
+  function createNewRecordRow(table, dodatokData, tr, record) {
     let fill = false;
+    const oldRecord = Object.assign({}, record);
     if (record) {
-      tr = thatTr;
       tr.innerHTML = "";
       fill = true;
     } else record = {};
@@ -267,13 +268,42 @@
         default:
           const textBox = document.createElement("input");
           td.append(textBox);
+          if (fill) textBox.id = `${element}-${record.id}`;
+          else textBox.id = element;
           textBox.type = "text";
           textBox.onchange = () => {
             record[element] = textBox.value;
           };
           if (fill) {
-            console.log(record[element]);
             textBox.value = record[element];
+          }
+          if (element != "student") {
+            switch (element) {
+              case "basePractic":
+                autoComplite(["ЧНУ", "ЧДТУ", "ЧЧНУ"], textBox.id);
+                break;
+              case "headOfPractic":
+                const heads = [];
+                Object.keys(externalData.handBook.npp).forEach(key => {
+                  if (externalData.handBook.npp[key].katedraid == userInfo.department_id) {
+                    const element = externalData.handBook.npp[key];
+                    heads.push(`${element.position} ${element.surname} ${element.name[0]}. ${element.middlename[0]}.`);
+                  }
+                });
+                autoComplite(heads, textBox.id);
+                break;
+              default:
+                const departID = element.slice(4, element.indexOf("-", 4));
+                const arr = [];
+                Object.keys(externalData.handBook.npp).forEach(key => {
+                  if (externalData.handBook.npp[key].katedraid == departID) {
+                    const element = externalData.handBook.npp[key];
+                    arr.push(`${element.position} ${element.surname} ${element.name[0]}. ${element.middlename[0]}.`);
+                  }
+                });
+                autoComplite(arr, textBox.id);
+                break;
+            }
           }
           break;
       }
@@ -285,7 +315,7 @@
       if (fill) {
         if (sendDataToSheet(userInfo.user_sheet_id, orderData.id, record, record.id)) {
           // додати ці дані в таблицю та відмалювати
-          tr.innerHTML = '';
+          tr.innerHTML = "";
           createShowRow(table, dodatokData, tr, record);
         } else failedMesseage();
         console.log(record);
@@ -293,7 +323,7 @@
         record.id = String(new Date().getTime());
         if (sendDataToSheet(userInfo.user_sheet_id, orderData.id, record)) {
           // додати ці дані в таблицю та відмалювати
-          tr.innerHTML = '';
+          tr.innerHTML = "";
           createShowRow(table, dodatokData, tr, record);
         } else failedMesseage();
         console.log(record);
@@ -303,10 +333,14 @@
     btnCancel.innerText = "відмінити";
     tr.append(btnCancel);
     btnCancel.onclick = () => {
-      tr.innerHTML = '';
-      createShowRow(table, dodatokData, tr, record);
+      if (fill) {
+        tr.innerHTML = "";
+        createShowRow(table, dodatokData, tr, oldRecord);
+      } else {
+        tr.remove();
+        table.append(createBtnNewRecord(table, dodatokData));
+      }
     };
-    if (!fill) return tr;
   }
 
   function createBody(table, dodatokData) {
@@ -330,7 +364,7 @@
     tr.append(btnEdit);
     btnEdit.innerText = "редагувати запис";
     btnEdit.onclick = () => {
-      createNewRecordRow(table, dodatokData, record, tr);
+      createNewRecordRow(table, dodatokData, tr, record);
     };
     // delete row  record button
     const btnDelete = document.createElement("button");
