@@ -45,6 +45,22 @@ function getDataFromTable(sheetID, tableName) {
     return e;
   }
 }
+function getBasePractic(sheetID) {
+  var sheet = new Sheet(sheetID);
+  try {
+    return JSON.stringify(sheet.getBasePractic());
+  } catch (e) {
+    return e;
+  }
+}
+function setBasePractic(sheetID, base) {
+  var sheet = new Sheet(sheetID);
+  try {
+    return JSON.stringify(sheet.setBasePractic(base));
+  } catch (e) {
+    return e;
+  }
+}
 function sendDataToSheet(sheetID, sheetName, record, id) {
   var sheet = new Sheet(sheetID);
   try {

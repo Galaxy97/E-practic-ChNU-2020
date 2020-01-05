@@ -1,4 +1,5 @@
 <script>
+  let base = [];
   function goToAdditionalFunc(code) {
     getDateFromTable(userInfo.user_sheet_id, code)
       .then(res => {
@@ -31,12 +32,21 @@
       .catch(e => {
         failedMesseage(e);
       });
+
+    getBasePractic(userInfo.user_sheet_id)
+      .then(res => {
+        if (res) {
+          try {
+            base = JSON.parse(res);
+          } catch (error) {}
+        }
+      })
+      .catch(e => console.log(e));
   }
   function createAdditionalTable(dodatok) {
     const table = document.createElement("table");
     const dodatokData = {};
     if (dodatok) {
-      console.log(dodatok);
       dodatokData.headersKey = dodatok.key;
       dodatokData.headersValue = dodatok.value;
     } else {
@@ -280,7 +290,19 @@
           if (element != "student") {
             switch (element) {
               case "basePractic":
-                autoComplite(["ЧНУ", "ЧДТУ", "ЧЧНУ"], textBox.id);
+                autoComplite(base, textBox.id);
+                document.getElementById(textBox.id).onchange = () => {
+                  record[element] = textBox.value;
+                  if (base.indexOf(record[element]) === -1) {
+                    base.push(record[element]);
+                    setBasePractic(userInfo.user_sheet_id, record[element])
+                      .then(() => {
+                      })
+                      .catch(e => {
+                        console.log(e);
+                      });
+                  }
+                };
                 break;
               case "headOfPractic":
                 const heads = [];
@@ -325,6 +347,7 @@
           // додати ці дані в таблицю та відмалювати
           tr.innerHTML = "";
           createShowRow(table, dodatokData, tr, record);
+          table.append(createBtnNewRecord(table, dodatokData));
         } else failedMesseage();
         console.log(record);
       }

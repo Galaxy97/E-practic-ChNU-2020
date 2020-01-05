@@ -24,6 +24,22 @@
         .getUserInfo();
     });
   }
+  function getBasePractic(tableId) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .getBasePractic(tableId);
+    });
+  }
+  function setBasePractic(tableId, base) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .setBasePractic(tableId, base);
+    });
+  }
   function reWriteKeys(tableId, tableName, headers, values) {
     return new Promise((resolve, reject) => {
       google.script.run

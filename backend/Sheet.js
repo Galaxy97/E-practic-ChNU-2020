@@ -84,6 +84,23 @@ function Sheet(id) {
     sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     sheet.getRange(2, 1, 1, values.length).setValues([values]);
   };
+  this.getBasePractic = function() {
+    var sheet = this.sheet.getSheetByName("basePractic");
+    try {
+      var data = sheet.getRange(1, 1, sheet.getLastRow()).getValues();
+      var res = [];
+      data.forEach(function(elem) {
+        res.push(elem[0]);
+      })
+      return res;
+      } catch (error) {
+      return false;
+    }
+  };
+  this.setBasePractic = function(base) {
+    var sheet = this.sheet.getSheetByName("basePractic");
+    sheet.appendRow([base]);
+  };
 
   this.getKeys = function(sheet) {
     try {
@@ -127,6 +144,6 @@ function Sheet(id) {
 
 function test() {
   var sheet = new Sheet("1PhgGe8ZlGzgI-qVX_s0PYRHvstVyOYY9zN48g4AW46M");
-  var a = sheet.readRowById("main", "1577785954242");
+  var a = sheet.getBasePractic();
   Logger.log(a);
 }
