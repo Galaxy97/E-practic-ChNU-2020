@@ -4,8 +4,8 @@ function include(filename) {
 
 function getUserInfo() {
   // var email = Session.getActiveUser().getEmail();
-  // var email = "nf@vu.cdu.edu.ua";
-  var email = "infoteh@vu.cdu.edu.ua";
+  var email = "akit.ck@vu.cdu.edu.ua";
+  //  var email = "infoteh@vu.cdu.edu.ua";
   // var email = "nmv@vu.cdu.edu.ua";
   var accountTable = new Sheet("17FqI3CWAc407PEIFzVMAGH2IGbtK6CoHliI-MQVQ7s0");
   var accounts = accountTable.readFromSheet("accounts");
@@ -56,7 +56,8 @@ function getBasePractic(sheetID) {
 function setBasePractic(sheetID, base) {
   var sheet = new Sheet(sheetID);
   try {
-    return JSON.stringify(sheet.setBasePractic(base));
+    sheet.setBasePractic(base);
+    return true
   } catch (e) {
     return e;
   }
@@ -137,3 +138,32 @@ function createShufr(prefix) {
   } else year2 = String(year1 + 1);
   return prefix + "-" + String(year1).slice(2) + "/" + year2.slice(2) + "-" + numCode;
 }
+
+function createAdditionalDoc(sheetID, tableName) {
+  var sheet = new Sheet(sheetID);
+  try {
+    var data = sheet.readFromSheet(tableName);
+    var studentsArray = [];
+    data.forEach(function(row) {
+      const array = [];
+      for(key in row) {
+        if (key == 'id') continue;
+        if (key == 'captain') row[key] = row[key] ? "Староста" : "";
+        array.push(row[key]);
+      }
+      studentsArray.push(array);
+    });
+    var url = createAplication(tableName, studentsArray);
+    return url;
+  } catch (e) {
+    return e;
+  }
+}
+// var m = [
+//   ["Прізвище Ініціали", "Чи староста", "База практики", "Керівник практики"],
+//   ["Окунь В.П.", "Староста", "ЧНУ", "Величко С.П."],
+//   ["Прокопенко П.П.", "", "ЧНУ", "Величко С.П."],
+//   ["Яструб Г.М.", "", "ЧБК", "Заїка Г.Я."],
+//   ["Вареник С.Н.", "", "ЧНУ", "Теличко В.В."],
+//   ["Пономаренко В.А.", "Староста", "ЧБК", "Лящ З.Є."],
+// ];

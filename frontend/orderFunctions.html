@@ -25,7 +25,7 @@
     table.append(createTableBody(order));
 
     const back = document.createElement("button");
-    back.innerText = "Повернутись до графіків";
+    back.innerText = "до графіків";
     back.id = "backToGraph";
     back.onclick = () => {
       back.remove();
@@ -131,25 +131,18 @@
     /// ----------------------------------- ADDITIONAL
     td = document.createElement("td");
     if (orderData.additionUrl) {
-      var btnLink = document.createElement("button");
-      btnLink.innerText = "перейти";
-      var link = document.createElement("form");
-      link.append(btnLink);
-      link.target = "_blank";
-      link.action = orderData.orderUrl;
-      td.append(link);
-      var btnUpdate = document.createElement("button");
-      td.append(btnUpdate);
-      btnUpdate.innerText = "оновити додаток";
-      btnUpdate.onclick = () => {
-        alert("ти вирішив це переписать");
-      };
+      onClickFunc(td, orderData.additionUrl);
     } else {
       var btnCreate = document.createElement("button");
       td.append(btnCreate);
       btnCreate.innerText = "створити додаток";
       btnCreate.onclick = () => {
-        alert("ти вирішив це написати заново");
+        btnCreate.remove();
+        createAdditionalDoc(userInfo.user_sheet_id, orderData.id)
+          .then(res => {
+            onClickFunc(td, res);
+          })
+          .catch(e => console.error(e));
       };
     }
     var btnEditAdditional = document.createElement("button");
@@ -161,6 +154,28 @@
     tr.append(td);
     /// ----------------------------------- END ADDITIONAL
     return tr;
+  }
+
+  function onClickFunc(td, url) {
+    var btnLink = document.createElement("button");
+    btnLink.innerText = "перейти";
+    var link = document.createElement("form");
+    link.append(btnLink);
+    link.target = "_blank";
+    link.action = url;
+    td.append(link);
+    var btnUpdate = document.createElement("button");
+    td.append(btnUpdate);
+    btnUpdate.innerText = "оновити додаток";
+    btnUpdate.onclick = () => {
+      btnLink.remove();
+      btnUpdate.remove();
+      createAdditionalDoc(userInfo.user_sheet_id, orderData.id)
+        .then(res => {
+          onClickFunc(td, res);
+        })
+        .catch(e => console.error(e));
+    };
   }
 
   function parseDateFromDate(unixTime) {

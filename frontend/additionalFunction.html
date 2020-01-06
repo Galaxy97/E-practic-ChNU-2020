@@ -67,7 +67,7 @@
     table.append(createBtnNewRecord(table, dodatokData));
 
     const back = document.createElement("button");
-    back.innerText = "Повернутись до наказу???";
+    back.innerText = "до наказу";
     back.onclick = () => {
       back.remove();
       // show graph table
@@ -296,10 +296,9 @@
                   if (base.indexOf(record[element]) === -1) {
                     base.push(record[element]);
                     setBasePractic(userInfo.user_sheet_id, record[element])
-                      .then(() => {
-                      })
+                      .then(() => {})
                       .catch(e => {
-                        console.log(e);
+                        console.error(e);
                       });
                   }
                 };
@@ -345,6 +344,10 @@
         record.id = String(new Date().getTime());
         if (sendDataToSheet(userInfo.user_sheet_id, orderData.id, record)) {
           // додати ці дані в таблицю та відмалювати
+          if (!dodatokData.hasOwnProperty("body")) {
+            dodatokData.body = [];
+          }
+          dodatokData.body.push(record);
           tr.innerHTML = "";
           createShowRow(table, dodatokData, tr, record);
           table.append(createBtnNewRecord(table, dodatokData));
@@ -361,7 +364,12 @@
         createShowRow(table, dodatokData, tr, oldRecord);
       } else {
         tr.remove();
-        table.append(createBtnNewRecord(table, dodatokData));
+        if (table.childNodes.length < 3) {
+          table.innerHTML = "";
+          delete dodatokData.body;
+          table.append(createHeadersBlok(dodatokData.headersKey, dodatokData.headersValue));
+          table.append(createBtnNewRecord(table, dodatokData));
+        } else table.append(createBtnNewRecord(table, dodatokData));
       }
     };
   }
@@ -398,6 +406,12 @@
         deleteRecordInTable(userInfo.user_sheet_id, orderData.id, record.id)
           .then(() => {
             tr.remove();
+            if (table.childNodes.length < 3) {
+              table.innerHTML = "";
+              delete dodatokData.body;
+              table.append(createHeadersBlok(dodatokData.headersKey, dodatokData.headersValue));
+              table.append(createBtnNewRecord(table, dodatokData));
+            }
           })
           .catch(e => {
             failedMesseage(e);
