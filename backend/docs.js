@@ -6,6 +6,92 @@ var order_template_ID = "1uikVSwgrCHajjkTGioe24RGX3ovAHT1Pay9grOSdfIc"; // ша�
 var numColl = 2; // номер стовпця таблиці зі студентами, який містить бази практик
 var numCollS = 1; // номер стовпця з відміткою про старост
 
+// =============================================================================================
+//                               створення наказу
+// =============================================================================================
+function createOrder(externalData, recordData, orderData, headersID) {
+  var code = orderData.id;
+  var docID = copyOrderTemplate(code);
+  var obj = getStructureOrderTemplate(externalData, recordData, orderData, headersID);
+  var doc = DocumentApp.openById(docID); //відкриваємо новий документ
+  var body = doc.getBody();
+  //пошук заміна елементів шаблону
+  for (var prop in obj) {
+    body.replaceText("<<" + prop + ">>", obj[prop]);
+  }
+  doc.getFooter().replaceText("<<ID>>", code);
+  doc.saveAndClose();
+  //створюємо PDF
+  var pdfURL = convertPDF(docID);
+  return pdfURL;
+}
+
+function getStructureOrderTemplate(externalData, recordData, orderData, headersID) {
+  var result = {
+    PR1: getPR1(externalData, recordData), //"преамбула 1",
+    PR2: getPR2(externalData, recordData)
+    // "TNK": getOrderText(data, handbook, personalData, prorector, kerPrac, nachlnik, buhgalter, headers),
+    // "POSK": prorector.position,
+    // "NMK": prorector.name,
+    // "PV": getPV(data, personalData),
+    // "PP": getPP(data, personalData, handbook, prorector, kerPrac, nachlnik, buhgalter, yurist, headers)
+  };
+  return result;
+}
+
+function getPR1(externalData, recordData) {
+  // форма навчання
+  var formOfTraining = externalData.handBook.form_of_training[recordData.form_of_training].formtrainingname;
+  formOfTraining = formOfTraining.slice(0, formOfTraining.length - 1) + "ої";
+  formOfTraining = formOfTraining.toLowerCase();
+  // відміннюваня інституту
+  var inst;
+  if (
+    externalData.handBook.institutes[recordData.institutes].nameinstitute.slice(0, 27) == "Навчально-науковий інститут"
+  ) {
+    inst = "ННІ" + externalData.handBook.institutes[recordData.institutes].nameinstitute.slice(27);
+  }
+  if (
+    externalData.handBook.institutes[recordData.institutes].nameinstitute.slice(0, 24) == "Навчально-науковий центр"
+  ) {
+    inst = "ННЦ" + externalData.handBook.institutes[recordData.institutes].nameinstitute.slice(24);
+  }
+  if (externalData.handBook.institutes[recordData.institutes].nameinstitute.slice(0, 9) == "Факультет") {
+    inst = "Факультету" + externalData.handBook.institutes[recordData.institutes].nameinstitute.slice(9);
+  }
+  if (externalData.handBook.institutes[recordData.institutes].nameinstitute.slice(0, 4) == "Псих") {
+    inst = "Психологічного факультету";
+  }
+  var template =
+    "Про проведення <<PRACTIC>> студентів <<NUM_KURS>> курсу <<TERMIN>> спеціальності <<TYPE_SPECIAL>> ОС «<<LEVEL>>» <<TYPE_FORM>> форми навчання <<INST>>";
+  var keyMaps = {
+    PRACTIC: externalData.handBook.rulespractice[recordData.rulespractice].nameyakoi,
+    NUM_KURS: externalData.handBook.course_number[recordData.course_number].coursename,
+    TERMIN: recordData.termin ? "зі скороченим терміном навчання" : "",
+    TYPE_SPECIAL: externalData.handBook.specialty[recordData.specialty].namespecialtyintegrated,
+    LEVEL: externalData.handBook.educational_degree[recordData.educational_degree].educationaldegreename,
+    TYPE_FORM: formOfTraining,
+    INST: inst
+  };
+  //  //пошук заміна елементів шаблону
+  for (var prop in keyMaps) {
+    template = template.replace("<<" + prop + ">>", keyMaps[prop]);
+  }
+  return template;
+} ////"преамбула 1",
+
+function getPR2(externalData, recordData) {
+  return (
+    "Відповідно до навчального плану підготовки фахівців за спеціальністю «" +
+    externalData.handBook.specialty[recordData.specialty].namespecialtyintegrated.trim() +
+    "», положення «Про проведення практики студентів вищих навчальних закладів України», затвердженого наказом Міністерства освіти і науки України від 08.04.93 № 93"
+  );
+} ////"преамбула 2",
+
+// =============================================================================================
+//                               кінець створення наказу
+// =============================================================================================
+
 function createAplication(code, data) {
   //створення документу додатку до наказу
   //  var code = "IT-2019/2020-0002";//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -185,6 +271,16 @@ function delCollMonitor(data, IdCol) {
   });
   return newData;
 }
+
+function copyOrderTemplate(code) {
+  //створення копії файлу наказу з шаблону
+  var fileName = "Наказ " + code;
+  var file = DriveApp.getFileById(order_template_ID);
+  var folder = DriveApp.getFolderById(folder_ID);
+  var id = file.makeCopy(fileName, folder).getId();
+  return id;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///                                               PDF                                                 ///
 /////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -333,8 +333,10 @@
     if (userInfo.type == "dep" || userInfo.type == "inst") return td;
     // create agree btns for admin
     if (rowData.valid) {
-      td.append(createGrapFollowButton(tr, rowData));
+      if (userInfo.type == "admin") td.append(createGrapFollowButton(tr, rowData));
       // to disagree
+      editBtn.remove();
+      deleteBtn.remove();
       td.append(createDisAgreeBtn(tr, rowData));
     } else {
       // to agree

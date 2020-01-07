@@ -168,6 +168,28 @@ function createAdditionalDoc(sheetID, tableName) {
     return e;
   }
 }
+function createOrderDoc(sheetID, code) {
+  sheetID = "1PhgGe8ZlGzgI-qVX_s0PYRHvstVyOYY9zN48g4AW46M";
+  code = 'IT-19/20-0007';
+  try {
+    var sheet = new Sheet(sheetID);
+    var externalData = getExternalData();
+    var recordData = {};
+    var sourceData = sheet.readFromSheet("main");
+    for (var index in sourceData) {
+      if (sourceData[index].code == code) {
+        recordData = sourceData[index];
+        break;
+      }
+    }
+    var orderData = sheet.readRowById('order', code);
+    var headersID = sheet.getHeaders(code);
+    var url = createOrder(externalData, recordData, orderData, headersID);
+    return url;
+  } catch (e) {
+    return new Error(e);
+  }
+}
 // var m = [
 //   ["Прізвище Ініціали", "Чи староста", "База практики", "Керівник практики"],
 //   ["Окунь В.П.", "Староста", "ЧНУ", "Величко С.П."],

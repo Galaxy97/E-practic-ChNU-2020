@@ -112,6 +112,14 @@
         .createCode(userInfo, id, prefix);
     });
   }
+  function createOrderDoc(sheetID, code) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .createOrderDoc(sheetID, code);
+    });
+  }
   function createAdditionalDoc(sheetID, tableName) {
     return new Promise((resolve, reject) => {
       google.script.run

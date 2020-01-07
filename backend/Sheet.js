@@ -110,6 +110,21 @@ function Sheet(id) {
       return undefined;
     }
   };
+  this.getHeaders = function(sheetName) {
+    try {
+      var sheet = this.sheet.getSheetByName(sheetName);
+      var keys = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues();
+      var headers = [];
+      keys[0].forEach(function(key){
+        if (key.slice(0,3) == 'key') {
+          headers.push(key.slice(4, key.indexOf("-", 4)));
+        }
+      })
+      return headers;
+    } catch (error) {
+      return undefined;
+    }
+  };
 
   this.updateColomn = function(name, findKey, value) {
     var sheet = this.sheet.getSheetByName(name);

@@ -103,30 +103,23 @@
     // ---------------------------------- END TIME
 
     // ------------------------------------ ORDER
-    td = document.createElement("td");
+    const orderTd = document.createElement("td");
+    tr.append(orderTd);
     if (orderData.orderUrl) {
-      var btnLink = document.createElement("button");
-      btnLink.innerText = "перейти";
-      var link = document.createElement("form");
-      link.append(btnLink);
-      link.target = "_blank";
-      link.action = orderData.orderUrl;
-      td.append(link);
-      var btnUpdate = document.createElement("button");
-      td.append(btnUpdate);
-      btnUpdate.innerText = "оновити наказ";
-      btnUpdate.onclick = () => {
-        alert("ти вирішив це переписать");
-      };
+      onClickFunc(orderTd, orderData.orderUrl, true);
     } else {
-      var btnCreate = document.createElement("button");
-      td.append(btnCreate);
-      btnCreate.innerText = "створити наказ";
-      btnCreate.onclick = () => {
-        alert("ти вирішив це написати заново");
+      var btnCreateOrder = document.createElement("button");
+      orderTd.append(btnCreateOrder);
+      btnCreateOrder.innerText = "створити наказ";
+      btnCreateOrder.onclick = () => {
+        btnCreateOrder.remove();
+        createOrderDoc(userInfo.user_sheet_id, orderData.id)
+          .then(res => {
+            onClickFunc(orderTd, res, true);
+          })
+          .catch(e => console.error(e));
       };
     }
-    tr.append(td);
     // ------------------------------------ END ORDER
     /// ----------------------------------- ADDITIONAL
     td = document.createElement("td");
@@ -156,7 +149,7 @@
     return tr;
   }
 
-  function onClickFunc(td, url) {
+  function onClickFunc(td, url, order) {
     var btnLink = document.createElement("button");
     btnLink.innerText = "перейти";
     var link = document.createElement("form");
@@ -166,15 +159,23 @@
     td.append(link);
     var btnUpdate = document.createElement("button");
     td.append(btnUpdate);
-    btnUpdate.innerText = "оновити додаток";
+    btnUpdate.innerText = "оновити";
     btnUpdate.onclick = () => {
       btnLink.remove();
       btnUpdate.remove();
-      createAdditionalDoc(userInfo.user_sheet_id, orderData.id)
-        .then(res => {
-          onClickFunc(td, res);
-        })
-        .catch(e => console.error(e));
+      if (order) {
+        createOrderDoc(userInfo.user_sheet_id, orderData.id)
+          .then(res => {
+            onClickFunc(td, res, true);
+          })
+          .catch(e => console.error(e));
+      } else {
+        createAdditionalDoc(userInfo.user_sheet_id, orderData.id)
+          .then(res => {
+            onClickFunc(td, res);
+          })
+          .catch(e => console.error(e));
+      }
     };
   }
 
