@@ -94,7 +94,3 @@ function Directories() {
   };
   // ------------------------------------
 }
-
-function updateExternalData(){
-  new Directories().update();
-}

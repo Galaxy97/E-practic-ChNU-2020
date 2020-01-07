@@ -1,6 +1,6 @@
 function doGet() {
-  // var email = Session.getActiveUser().getEmail(); // services => see
- var email = "akit.ck@vu.cdu.edu.ua";
+  var email = Session.getActiveUser().getEmail(); // services => see
+//  var email = "akit.ck@vu.cdu.edu.ua";
 //  var email = "infoteh@vu.cdu.edu.ua";
   // var email = "nmv@vu.cdu.edu.ua";
   var template;
