@@ -187,7 +187,7 @@ function createOrderDoc(sheetID, code) {
     var url = createOrder(externalData, recordData, orderData, headersID);
     return url;
   } catch (e) {
-    return new Error(e);
+    return e.toString();
   }
 }
 // var m = [

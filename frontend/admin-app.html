@@ -1,6 +1,7 @@
 <script>
   function createMainWindow() {
     const instSelect = document.createElement("select");
+    instSelect.className = "option";
     document.getElementById("choose").append(instSelect);
 
     instSelect.append(createDefaulteOption());
@@ -15,6 +16,7 @@
       userInfo.institute_id = value;
 
       const depSelect = document.createElement("select");
+      depSelect.className = "option";
       depSelect.id = "departSelect";
       if (document.getElementById("departSelect")) document.getElementById("departSelect").remove();
       document.getElementById("choose").append(depSelect);

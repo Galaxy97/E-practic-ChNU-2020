@@ -4,18 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <?!= include('frontend/css/stylesheets'); ?>
   <title>Document</title>
 </head>
 <body>
-  <h1>admin</h1>
-  <section id="choose"></section>
-    <section id="content">
-      <div id="main"></div>
-    </section>
+  <header class = "header-label">
+    <lable class="user_name">Administrator</lable>
     <section id="adminPanel">
-      
     </section>
+    <!--button class = "button-local-storage hint down" data-title="Оновити дані">
+      <i class="fa fa-refresh" id="spinAnime" style="font-size:22px"></i>
+    </button-->
+  </header>
+  <section id="choose">
+  </section>
+  
+  <section id="content">
+    <div class="tablewrap pageWithSelect">
+      <div id="main"></div>
+    </div>
+  </section>
+  
   <?!= include('frontend/libraries'); ?>
   <?!= include('frontend/services'); ?>
   <?!= include('frontend/beforeLoadPage'); ?>

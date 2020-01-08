@@ -133,6 +133,7 @@
         btnCreate.remove();
         createAdditionalDoc(userInfo.user_sheet_id, orderData.id)
           .then(res => {
+            console.log(res);
             onClickFunc(td, res);
           })
           .catch(e => console.error(e));
