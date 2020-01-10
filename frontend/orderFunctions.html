@@ -25,7 +25,11 @@
     table.append(createTableBody(order));
 
     const back = document.createElement("button");
-    back.innerText = "до графіків";
+    back.className = "hint down";
+    back.dataset.title = "До графіків";
+    const fareply = document.createElement("i");
+    fareply.className = "fa fa-mail-reply";
+    back.append(fareply);
     back.id = "backToGraph";
     back.onclick = () => {
       back.remove();
@@ -97,7 +101,7 @@
           failedMesseage(e);
         });
     };
-    time.value = orderData.confTime.slice(0, 2) + ":" + orderData.confTime.slice(3);
+    if (orderData.confTime) time.value = orderData.confTime.slice(0, 2) + ":" + orderData.confTime.slice(3);
     td.append(time);
     tr.append(td);
     // ---------------------------------- END TIME
@@ -109,8 +113,12 @@
       onClickFunc(orderTd, orderData.orderUrl, true);
     } else {
       var btnCreateOrder = document.createElement("button");
+      btnCreateOrder.className = "hint up";
+      btnCreateOrder.dataset.title = "Переглянути pdf(Cтворити наказ)";
+      const fapdf = document.createElement("i");
+      fapdf.className = "fa fa-file-pdf-o";
+      btnCreateOrder.append(fapdf);
       orderTd.append(btnCreateOrder);
-      btnCreateOrder.innerText = "створити наказ";
       btnCreateOrder.onclick = () => {
         btnCreateOrder.remove();
         createOrderDoc(userInfo.user_sheet_id, orderData.id)
@@ -127,8 +135,12 @@
       onClickFunc(td, orderData.additionUrl);
     } else {
       var btnCreate = document.createElement("button");
+      btnCreate.className = "hint up";
+      btnCreate.dataset.title = "Друкувати в pdf(Створити додаток)";
+      const faprint = document.createElement("i");
+      faprint.className = "fa fa-print";
+      btnCreate.append(faprint);
       td.append(btnCreate);
-      btnCreate.innerText = "створити додаток";
       btnCreate.onclick = () => {
         btnCreate.remove();
         createAdditionalDoc(userInfo.user_sheet_id, orderData.id)
@@ -140,8 +152,12 @@
       };
     }
     var btnEditAdditional = document.createElement("button");
+    btnEditAdditional.className = "hint up";
+    btnEditAdditional.dataset.title = "Редагувати дані(редагувати додаток)";
+    const faedit = document.createElement("i");
+    faedit.className = "fa fa-edit";
+    btnEditAdditional.append(faedit);
     td.append(btnEditAdditional);
-    btnEditAdditional.innerText = "редагувати додаток";
     btnEditAdditional.onclick = () => {
       goToAdditionalFunc(orderData.id);
     };
@@ -165,14 +181,15 @@
       btnLink.remove();
       btnUpdate.remove();
       if (order) {
-        createOrderDoc(userInfo.user_sheet_id, orderData.id)
+        createOrderDoc(userInfo.user_sheet_id, orderData.id, url)
           .then(res => {
             onClickFunc(td, res, true);
           })
           .catch(e => console.error(e));
       } else {
-        createAdditionalDoc(userInfo.user_sheet_id, orderData.id)
+        createAdditionalDoc(userInfo.user_sheet_id, orderData.id, url)
           .then(res => {
+            console.log(res);
             onClickFunc(td, res);
           })
           .catch(e => console.error(e));

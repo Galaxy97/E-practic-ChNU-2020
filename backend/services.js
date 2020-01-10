@@ -148,7 +148,7 @@ function updateExternalData() {
   }
 }
 
-function createAdditionalDoc(sheetID, tableName) {
+function createAdditionalDoc(sheetID, tableName, url) {
   var sheet = new Sheet(sheetID);
   try {
     var data = sheet.readFromSheet(tableName);
@@ -162,15 +162,15 @@ function createAdditionalDoc(sheetID, tableName) {
       }
       studentsArray.push(array);
     });
-    var url = createAplication(tableName, studentsArray);
-    return url;
+    var orderData = sheet.readRowById("order", tableName);
+    orderData.additionUrl = createAplication(tableName, studentsArray, url);
+    sheet.writeInSheet("order", orderData, tableName);
+    return orderData.additionUrl;
   } catch (e) {
-    return e;
+    return e.toString();
   }
 }
-function createOrderDoc(sheetID, code) {
-  sheetID = "1PhgGe8ZlGzgI-qVX_s0PYRHvstVyOYY9zN48g4AW46M";
-  code = 'IT-19/20-0007';
+function createOrderDoc(sheetID, code, oldID) {
   try {
     var sheet = new Sheet(sheetID);
     var externalData = getExternalData();
@@ -182,19 +182,12 @@ function createOrderDoc(sheetID, code) {
         break;
       }
     }
-    var orderData = sheet.readRowById('order', code);
+    var orderData = sheet.readRowById("order", code);
     var headersID = sheet.getHeaders(code);
-    var url = createOrder(externalData, recordData, orderData, headersID);
-    return url;
+    orderData.orderUrl = createOrder(externalData, recordData, orderData, headersID, oldID);
+    sheet.writeInSheet("order", orderData, code);
+    return orderData.orderUrl;
   } catch (e) {
     return e.toString();
   }
 }
-// var m = [
-//   ["Прізвище Ініціали", "Чи староста", "База практики", "Керівник практики"],
-//   ["Окунь В.П.", "Староста", "ЧНУ", "Величко С.П."],
-//   ["Прокопенко П.П.", "", "ЧНУ", "Величко С.П."],
-//   ["Яструб Г.М.", "", "ЧБК", "Заїка Г.Я."],
-//   ["Вареник С.Н.", "", "ЧНУ", "Теличко В.В."],
-//   ["Пономаренко В.А.", "Староста", "ЧБК", "Лящ З.Є."],
-// ];

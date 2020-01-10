@@ -112,20 +112,20 @@
         .createCode(userInfo, id, prefix);
     });
   }
-  function createOrderDoc(sheetID, code) {
+  function createOrderDoc(sheetID, code, oldID) {
     return new Promise((resolve, reject) => {
       google.script.run
         .withSuccessHandler(resolve)
         .withFailureHandler(reject)
-        .createOrderDoc(sheetID, code);
+        .createOrderDoc(sheetID, code, oldID);
     });
   }
-  function createAdditionalDoc(sheetID, tableName) {
+  function createAdditionalDoc(sheetID, tableName, url) {
     return new Promise((resolve, reject) => {
       google.script.run
         .withSuccessHandler(resolve)
         .withFailureHandler(reject)
-        .createAdditionalDoc(sheetID, tableName);
+        .createAdditionalDoc(sheetID, tableName, url);
     });
   }
 

@@ -32,6 +32,9 @@
         depSelect.append(createOption(value, text));
       }
       depSelect.onchange = () => {
+        if (document.getElementById("backToGraph"))document.getElementById("backToGraph").remove();
+        if (document.getElementById("backToOrder"))document.getElementById("backToOrder").remove();
+        tableDate = {};
         const value = depSelect.options[depSelect.selectedIndex].value;
         userInfo.department_id = value;
         findDepartmentSheet(value)
@@ -59,18 +62,23 @@
     const div = document.createElement("div");
     document.getElementById("adminPanel").append(div);
 
-    const h3 = document.createElement("h3");
-    div.append(h3);
-    h3.innerText = "Admin panel";
-
     const btnUpdate = document.createElement("button");
     div.append(btnUpdate);
-    btnUpdate.innerText = "Оновити довідники";
+    btnUpdate.className = "button-local-storage hint down";
+    btnUpdate.dataset.title = "Оновити дані";
+    btnUpdate.style.position = 'relative';
+    
+    const icoBtnUpDate = document.createElement("i");
+    btnUpdate.append(icoBtnUpDate);
+    icoBtnUpDate.className = "fa fa-refresh ";
+    icoBtnUpDate.id = "spinAnime";
+    
     btnUpdate.onclick = () => {
-      btnUpdate.remove();
       updateExternalData()
         .then(() => div.append(btnUpdate))
         .catch(e => console.error(e));
     };
+
+
   }
 </script>

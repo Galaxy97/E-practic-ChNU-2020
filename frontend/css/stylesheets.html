@@ -1,4 +1,7 @@
 <style>
+  @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+  @import url('https://fonts.googleapis.com/css?family=Rubik&display=swap');
+
   body, header, section, table, strong, div{
     margin:0;
     padding:0;
@@ -8,6 +11,31 @@
     background-color:#FDFEFE;
   }
   
+  button{
+    position: relative;
+    margin:5px;
+    cursor:pointer;
+    border:none;
+    outline:none;
+    color:#212F3D;
+    border-radius:10px;
+  }
+
+/*-----Вспливаючі підказки для кнопок--------*/
+  .hint:hover::after { 
+   content: attr(data-title); 
+   position: absolute;
+   z-index: 99;
+   background: rgba(255,255,230,1);
+   color:#000;
+   font-family: Arial, sans-serif;
+   font-size: 11px;
+   padding: 3px 7px;
+   border: 1px solid #D5DBDB;
+   transition: all 0.5s ease;
+  }
+  .up:hover::after {bottom: 110%;  right:50%;}
+  .down:hover::after {top: 140%;  left:-30%;}
 /*---------- header ------------------*/
   .header-label{
     width:100vw;
@@ -25,7 +53,30 @@
     margin-left:1.5vw;
     color:#fff;
   }
+/*------кнопка оновлення даних адмінської сторінки------*/
+  .button-local-storage{
+    position:relative;
+    background-color:#5DADE2;
+    margin-right:1.7vw;
+    color:#fff;
+  }
   
+  #spinAnime{
+    font-size:22px;
+    animation-name: rotation;
+    animation-duration: 3s;
+    animation-timing-function: linear;
+  }
+  
+  @keyframes rotation {
+    0% {
+      transform:rotate(0deg);
+    }
+    100% {
+      transform:rotate(360deg);
+    }
+  }
+
 /*----- селектори інституцької/адмінської сторінок ------*/
 #choose{
   height:8vh;
@@ -109,8 +160,34 @@
   tr:nth-child(even) {
     background: #F2F3F4;
   }
-/*---------- table button-----------------*/
 
+/*---------- table button-----------------*/
+  .table-graph-btn-create,
+  .table-record-btn-create{
+    width:88px;
+    height:32px;
+    margin:2px auto 2px;
+    background-color:#2ECC71;
+    border-radius:25px;
+    color:#fff;
+    display: flex;
+    flex-direction:row-reverse;
+    align-items:center;
+    justify-content:space-between;
+  }
+  
+  .table-record-btn-create{width:68px;height:30px;}
+  
+  .fa-plus{transition: all 0.15s linear;}
+  
+  .table-graph-btn-create:hover .fa-plus,
+  .table-record-btn-create:hover .fa-plus{
+    font-size:18px;
+    transition: all 0.2s linear;
+  }
+  
+
+/*-------------------------------------------------------*/
   .toast {
     max-width: 350px;
     overflow: hidden;
@@ -120,7 +197,7 @@
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 0.25rem;
     box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
+    /*backdrop-filter: blur(10px); --------------------- ?????????????????? ----------------*/
     display: none;
   }
 

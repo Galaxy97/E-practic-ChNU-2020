@@ -67,7 +67,12 @@
     table.append(createBtnNewRecord(table, dodatokData));
 
     const back = document.createElement("button");
-    back.innerText = "до наказу";
+    back.className = 'hint down';
+    back.id = "backToOrder";
+    back.dataset.title = 'До наказу';
+    const fareply = document.createElement('i');
+    fareply.className = 'fa fa-mail-reply';
+    back.append(fareply);
     back.onclick = () => {
       back.remove();
       // show graph table
@@ -157,7 +162,11 @@
         newTh.append(newInput);
         newInput.type = "text";
         const btnSave = document.createElement("button");
-        btnSave.innerText = "зберегти";
+        btnSave.className = 'hint up';
+        btnSave.dataset.title = 'Зберегти';
+        const fareply = document.createElement('i');
+        fareply.className = 'fa fa-save';
+        btnSave.append(fareply);
         newTh.append(btnSave);
         btnSave.onclick = () => {
           if (!select.options[select.selectedIndex].value) {
@@ -231,7 +240,11 @@
 
   function createBtnNewRecord(table, dodatokData) {
     const btnCreateRecord = document.createElement("button");
-    btnCreateRecord.innerText = "додати запис";
+    btnCreateRecord.innerText = "Запис";
+    btnCreateRecord.className = 'table-record-btn-create';
+    const faplus = document.createElement('i');
+    faplus.className = 'fa fa-plus';
+    btnCreateRecord.append(faplus);
     btnCreateRecord.onclick = () => {
       btnCreateRecord.remove();
       if (!dodatokData.hasOwnProperty("body")) {
@@ -330,8 +343,12 @@
       }
     });
     const btnSave = document.createElement("button");
+    btnSave.className = 'hint up';
+    btnSave.dataset.title = 'Зберегти';
+    const fareply = document.createElement('i');
+    fareply.className = 'fa fa-save';
+    btnSave.append(fareply);
     tr.append(btnSave);
-    btnSave.innerText = "зберегти";
     btnSave.onclick = () => {
       if (fill) {
         if (sendDataToSheet(userInfo.user_sheet_id, orderData.id, record, record.id)) {
@@ -356,7 +373,11 @@
       }
     };
     const btnCancel = document.createElement("button");
-    btnCancel.innerText = "відмінити";
+    btnCancel.className = 'hint up';
+    btnCancel.dataset.title = 'Відмінити';
+    const faremove = document.createElement('i');
+    faremove.className = 'fa fa-mail-reply-all';
+    btnCancel.append(faremove);
     tr.append(btnCancel);
     btnCancel.onclick = () => {
       if (fill) {
@@ -392,15 +413,23 @@
     });
     // edit row record button
     const btnEdit = document.createElement("button");
+    btnEdit.className = 'hint up';
+    btnEdit.dataset.title= "Редагувати запис";
+    const faedit = document.createElement('i');
+    faedit.className = 'fa fa-edit';
+    btnEdit.append(faedit);
     tr.append(btnEdit);
-    btnEdit.innerText = "редагувати запис";
     btnEdit.onclick = () => {
       createNewRecordRow(table, dodatokData, tr, record);
     };
     // delete row  record button
     const btnDelete = document.createElement("button");
+    btnDelete.className = 'hint up';
+    btnDelete.dataset.title= "Видалити запис";
+    const faEdit = document.createElement('i');
+    faEdit.className = 'fa fa-trash-o';
+    btnDelete.append(faEdit);
     tr.append(btnDelete);
-    btnDelete.innerText = "видалити запис";
     btnDelete.onclick = () => {
       if (confirm("Ви хочете видалити графік?")) {
         deleteRecordInTable(userInfo.user_sheet_id, orderData.id, record.id)

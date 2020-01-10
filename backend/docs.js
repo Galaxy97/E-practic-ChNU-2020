@@ -25,7 +25,7 @@ var nbsp = "\u00A0";
 // =============================================================================================
 //                               створення наказу
 // =============================================================================================
-function createOrder(externalData, recordData, orderData, headersID) {
+function createOrder(externalData, recordData, orderData, headersID, oldID) {
   var code = orderData.id;
   var docID = copyOrderTemplate(code);
   var obj = getStructureOrderTemplate(externalData, recordData, orderData, headersID);
@@ -39,8 +39,15 @@ function createOrder(externalData, recordData, orderData, headersID) {
   doc.saveAndClose();
   //створюємо PDF
   var pdfURL = convertPDF(docID);
+  if (oldID) {
+    // delete old version
+    DriveApp.getFileById(getIdFromUrl(oldID)).setTrashed(true);
+    //// ------------
+  }
   return pdfURL;
 }
+
+function getIdFromUrl(url) { return url.match(/[-\w]{25,}/); }
 
 function getStructureOrderTemplate(externalData, recordData, orderData, headersID) {
   var prorector = {};
@@ -181,7 +188,8 @@ function getOrderText(externalData, recordData, orderData, headersID, kerPrac, b
     "\n\t3." +
     nbsp +
     "Надати навчально-методичне забезпечення і проводити контроль за виконанням програми практики. Провести настановчу конференцію <<DATE_TIME>> ";
-  if (headersID.length > 0) template += vidpovidalni(headersID);
+  if (headersID.length > 0)
+    template += " Відповідальні — завідувач <<ZAV_KAF_POS>> <<ZAV_KAF>>, " + vidpovidalni(externalData, headersID);
   else template += "Відповідальний — завідувач <<ZAV_KAF_POS>> <<ZAV_KAF>>";
   template +=
     "\n\t4." +
@@ -194,7 +202,8 @@ function getOrderText(externalData, recordData, orderData, headersID, kerPrac, b
     nbsp +
     "Створити комісію в складі керівників практики і викладачів фахової кафедри та провести захисти звітів студентів за результатами практики. Термін виконання до " +
     "<<DEADLINE>>.";
-  if (headersID.length > 0) template += vidpovidalni(headersID);
+  if (headersID.length > 0)
+    template += " Відповідальні — завідувач <<ZAV_KAF_POS>> <<ZAV_KAF>>, " + vidpovidalni(externalData, headersID);
   else template += " Відповідальний — завідувач <<ZAV_KAF_POS>> <<ZAV_KAF>>";
   if (recordData.typepractice == 2 && recordData.form_of_training == 1 && recordData.educational_degree == 1) {
     template +=
@@ -204,7 +213,7 @@ function getOrderText(externalData, recordData, orderData, headersID, kerPrac, b
       "\n\t8." +
       nbsp +
       "Контроль за виконанням наказу покласти на <<NACHALNIK_POS>> <<NACHALNIK>>";
-  } else template += "\n\t7." + nbsp + "Контроль за виконанням наказу покласти на <<NACHALNIK_POS>> <<NACHALNIK>>.";
+  } else template += "\n\t7." + nbsp + "Контроль за виконанням наказу покласти на <<NACHALNIK_POS>> <<NACHALNIK>>";
 
   var keyMaps = {
     HOURS: recordData.hours,
@@ -248,7 +257,7 @@ function getPV(externalData, recordData) {
 
 function getPP(externalData, recordData, orderData, headersID, prorector, kerPrac, nachlnik, buhgalter, yurist) {
   var text = yurist.position + "\n" + "_____________" + yurist.name + "\n__________________\n";
-  if (recordData.typepractice == 2) {
+  if (recordData.typepractice == 2 && recordData.form_of_training == 1 && recordData.educational_degree == 1) {
     text += buhgalter.position + "\n" + "_____________" + buhgalter.nameIN + "\n__________________\n";
   }
   text += "завідувач практики" + "\n" + "_____________" + kerPrac.nameIN + "\n__________________\n";
@@ -259,24 +268,18 @@ function getPP(externalData, recordData, orderData, headersID, prorector, kerPra
     "\n_____________" +
     getDirectorInst(externalData.handBook.director[recordData.institutes], true) +
     "\n__________________\n";
-  // if (headers) {
-  //   if (headers.length > 0) {
-  //     headers.forEach(function(id) {
-  //       text +=
-  //         "завідувач кафедри" +
-  //         handBook["departments"][id].namedepartment.slice(7) +
-  //         "\n_____________ " +
-  //         personalData.zavkaf[id].name[0] +
-  //         "." +
-  //         nbsp +
-  //         personalData.zavkaf[id].middlename[0] +
-  //         "." +
-  //         nbsp +
-  //         personalData.zavkaf[id].surname +
-  //         "\n__________________\n";
-  //     });
-  //   }
-  // }
+  if (recordData.typepractice == 2 && recordData.form_of_training == 1 && recordData.educational_degree == 1) {
+  }
+  if (headersID.length > 0) {
+    headersID.forEach(function(id) {
+      text +=
+        "завідувач кафедри" +
+        externalData.handBook.departments[id].namedepartment.slice(7) +
+        "\n_____________ " +
+        getZavKaf(externalData, id, true) +
+        "\n__________________\n";
+    });
+  }
   return text;
 }
 
@@ -324,11 +327,16 @@ function getZavKaf(externalData, depID, invert) {
     );
 }
 
-function vidpovidalni(headersID) {
-  var template = " Відповідальні — завідувач <<ZAV_KAF_POS>> <<ZAV_KAF>>, ";
+function vidpovidalni(externalData, headersID) {
+  var template = "";
   for (var i = 0; i < headersID.length; i++) {
-    template += "завідувач кафедри <<KAF-" + headersID + "-" + i + ">>";
+    template +=
+      "завідувач кафедри " +
+      externalData.handBook.departments[headersID[i]].namedepartment.slice(7) +
+      nbsp +
+      getZavKaf(externalData, headersID[i], true);
     if (i + 1 != headersID.length) template += ",";
+    else template += ".";
   }
   return template;
 }
@@ -371,7 +379,7 @@ function getInstitutes(inst, full) {
 //                               кінець створення наказу
 // =============================================================================================
 
-function createAplication(code, data) {
+function createAplication(code, data, url) {
   //створення документу додатку до наказу
   //  var code = "IT-2019/2020-0002";//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   //  var data = m;//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -464,6 +472,12 @@ function createAplication(code, data) {
   //створюємо PDF
   var pdfURL = convertPDF(docID);
   //  var docPDF = DocumentApp.openById(pdfID);
+  if (url) {
+    // delete old version
+    var id = getIdFromUrl(url);
+    DriveApp.getFileById(id).setTrashed(true);
+    //// ------------
+  }
   return pdfURL;
 }
 

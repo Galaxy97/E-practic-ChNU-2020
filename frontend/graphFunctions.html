@@ -19,7 +19,11 @@
   function createBtnNewGraph() {
     const table = document.getElementById("table");
     const btn = document.createElement("button");
-    btn.innerText = "створити новий графік";
+    btn.innerText = 'Створити';
+    btn.className = 'table-graph-btn-create';
+    const faplus = document.createElement('i');
+    faplus.className = 'fa fa-plus';
+    btn.append(faplus);
     btn.onclick = () => {
       btn.remove();
       table.append(createNewGraph());
@@ -200,12 +204,23 @@
 
   function createNewGraphButtons(tr, thisRecorData) {
     const td = document.createElement("td");
+    
     const saveBtn = document.createElement("button");
+    saveBtn.className = 'hint up';
+    saveBtn.dataset.title = 'Зберегти';
+    const fareply = document.createElement('i');
+    fareply.className = 'fa fa-save';
+    saveBtn.append(fareply);
+    
     const cancelBtn = document.createElement("button");
+    cancelBtn.className = 'hint up';
+    cancelBtn.dataset.title = 'Відмінити';
+    const faremove = document.createElement('i');
+    faremove.className = 'fa fa-reply-all';
+    cancelBtn.append(faremove);
     td.append(saveBtn);
     td.append(cancelBtn);
 
-    saveBtn.innerText = "зберегти";
     saveBtn.onclick = () => {
       thisRecorData.user_email = userInfo.user_email;
       thisRecorData.institutes = userInfo.institute_id;
@@ -228,8 +243,6 @@
         createBtnNewGraph();
       } else failedMesseage();
     };
-
-    cancelBtn.innerText = "відмінити";
     cancelBtn.onclick = () => {
       tr.remove();
       createBtnNewGraph();
@@ -285,14 +298,22 @@
   function createGrapEditButton(tr, rowData) {
     const td = document.createElement("td");
     const editBtn = document.createElement("button");
-    editBtn.innerText = "редагувати";
+    editBtn.className = 'hint up';
+    editBtn.dataset.title ='Редагувати';
+    const edit = document.createElement('i');
+    edit.className = 'fa fa-edit';
+    editBtn.append(edit);
     td.append(editBtn);
     editBtn.onclick = () => {
       tr.innerHTML = "";
       const editRecord = createInputUnits(tr, rowData.id, rowData); // стоворити комірки для введення інформації, та повернути об'єкт як результат, де будуть зберігатись дані з юнітів
       const btnSave = document.createElement("button");
+      btnSave.className = 'hint up';
+      btnSave.dataset.title = 'Зберегти';
+      const fasave = document.createElement('i');
+      fasave.className = 'fa fa-save';
+      btnSave.append(fasave);
       tr.append(btnSave);
-      btnSave.innerText = "зберегти";
       btnSave.onclick = () => {
         for (const unit of externalData.formData) {
           if (unit.necessarily) {
@@ -310,14 +331,22 @@
       };
 
       const btnCancel = document.createElement("button");
+      btnCancel.className = 'hint up';
+      btnCancel.dataset.title = 'Відмінити';
+      const fareply = document.createElement('i');
+      fareply.className = 'fa fa-mail-reply-all';
+      btnCancel.append(fareply);
       tr.append(btnCancel);
-      btnCancel.innerText = "відмінити";
       btnCancel.onclick = () => {
         createRowShowRecord(editRecord, tr);
       };
     };
     const deleteBtn = document.createElement("button");
-    deleteBtn.innerText = "видалити";
+    deleteBtn.className = 'hint up';
+    deleteBtn.dataset.title ='Видалити';
+    const remove = document.createElement('i');
+    remove.className = 'fa fa-trash-o';
+    deleteBtn.append(remove);
     td.append(deleteBtn);
     deleteBtn.onclick = () => {
       if (confirm("Ви хочете видалити графік?")) {
@@ -364,7 +393,11 @@
 
   function createGrapFollowButton(tr, rowData) {
     const goToOrder = document.createElement("button");
-    goToOrder.innerText = "до наказу";
+    goToOrder.className = 'hint up';
+    goToOrder.dataset.title = 'До наказу';
+    const fareply = document.createElement('i');
+    fareply.className = 'fa fa-mail-forward';
+    goToOrder.append(fareply);
     goToOrder.onclick = () => {
       goToOrderFunc(rowData.code);
     };
